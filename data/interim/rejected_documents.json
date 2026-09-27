@@ -296,12 +296,12 @@
   {
     "id": "driver_john_james",
     "reason": "too_short",
-    "word_count": 76
+    "word_count": 75
   },
   {
     "id": "driver_godia",
     "reason": "too_short",
-    "word_count": 54
+    "word_count": 52
   },
   {
     "id": "driver_grignard",
@@ -501,7 +501,7 @@
   {
     "id": "driver_halford",
     "reason": "too_short",
-    "word_count": 89
+    "word_count": 87
   },
   {
     "id": "driver_emery",
@@ -526,7 +526,7 @@
   {
     "id": "driver_gibson",
     "reason": "too_short",
-    "word_count": 43
+    "word_count": 42
   },
   {
     "id": "driver_bisch",
@@ -706,7 +706,7 @@
   {
     "id": "driver_andersson",
     "reason": "too_short",
-    "word_count": 73
+    "word_count": 71
   },
   {
     "id": "driver_gabbiani",
@@ -766,7 +766,7 @@
   {
     "id": "team_pawl",
     "reason": "too_short",
-    "word_count": 28
+    "word_count": 25
   },
   {
     "id": "team_bromme",
@@ -780,7 +780,7 @@
   {
     "id": "team_sherman",
     "reason": "too_short",
-    "word_count": 63
+    "word_count": 61
   },
   {
     "id": "team_turner",
@@ -789,12 +789,12 @@
   {
     "id": "team_pankratz",
     "reason": "too_short",
-    "word_count": 33
+    "word_count": 31
   },
   {
     "id": "team_phillips",
     "reason": "too_short",
-    "word_count": 23
+    "word_count": 21
   },
   {
     "id": "team_vhristensen",

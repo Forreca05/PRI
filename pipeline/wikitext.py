@@ -26,7 +26,9 @@ INLINE_TEMPLATES = {
     'transl': lambda t: arg(t, 2),
     'ill': lambda t: arg(t, 1),
     'interlanguage link': lambda t: arg(t, 1),
-    'f1': lambda t: 'Formula One',
+    'f1': lambda t: arg(t, 1),                             # {{F1|2022}} -> '2022'
+    'f1 gp': lambda t: f'{arg(t, 2)} Grand Prix',           # {{F1 GP|2021|Abu Dhabi}} -> 'Abu Dhabi Grand Prix'
+    'f1gp': lambda t: f'{arg(t, 2)} Grand Prix',
     'nbsp': lambda t: ' ',
     'spaces': lambda t: ' ',
     'space': lambda t: ' ',

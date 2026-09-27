@@ -88,6 +88,12 @@ Projeto/
         └── *.png              ← 9 gráficos
 ```
 
+> **Onde está o texto?** Só em `data/processed/documents.json`. Os ficheiros
+> `interim/*_structured.json` têm apenas os dados da Jolpica e o link da Wikipedia:
+> o texto é descarregado no passo 3 e juntado no passo 4. Por exemplo, o documento
+> `driver_leclerc` em `processed/` tem os mesmos campos mais `summary` e `biography`
+> (8073 palavras).
+
 **Porquê separar `raw` / `interim` / `processed`?** O `raw` nunca é modificado:
 qualquer passo pode ser refeito a partir dele, o que torna o pipeline
 **reprodutível**. O `interim` guarda as decisões tomadas (o que foi rejeitado, como
