@@ -1,0 +1,710 @@
+{
+  "documents": {
+    "race": 1116,
+    "driver": 719,
+    "team": 147
+  },
+  "total_documents": 1982,
+  "words_per_document": {
+    "race": {
+      "count": 1116.0,
+      "mean": 1251.7,
+      "std": 1211.8,
+      "min": 100.0,
+      "25%": 443.5,
+      "50%": 826.5,
+      "75%": 1525.0,
+      "max": 5937.0
+    },
+    "driver": {
+      "count": 719.0,
+      "mean": 1420.6,
+      "std": 1920.0,
+      "min": 100.0,
+      "25%": 248.0,
+      "50%": 690.0,
+      "75%": 1762.0,
+      "max": 14170.0
+    },
+    "team": {
+      "count": 147.0,
+      "mean": 1921.0,
+      "std": 2310.8,
+      "min": 100.0,
+      "25%": 474.5,
+      "50%": 1082.0,
+      "75%": 2651.5,
+      "max": 14130.0
+    }
+  },
+  "total_tokens": 2649343,
+  "vocabulary_size": 32502,
+  "hapax_legomena": 11828,
+  "stopword_token_ratio": 0.454,
+  "top_terms": {
+    "race": [
+      [
+        "race",
+        16224
+      ],
+      [
+        "lap",
+        13352
+      ],
+      [
+        "second",
+        8932
+      ],
+      [
+        "prix",
+        6730
+      ],
+      [
+        "grand",
+        6599
+      ],
+      [
+        "championship",
+        6217
+      ],
+      [
+        "car",
+        5988
+      ],
+      [
+        "time",
+        5816
+      ],
+      [
+        "drivers",
+        5784
+      ],
+      [
+        "formula",
+        5642
+      ],
+      [
+        "schumacher",
+        5160
+      ],
+      [
+        "hamilton",
+        4820
+      ],
+      [
+        "session",
+        4623
+      ],
+      [
+        "place",
+        4421
+      ],
+      [
+        "points",
+        4289
+      ],
+      [
+        "pit",
+        4287
+      ],
+      [
+        "driver",
+        4159
+      ],
+      [
+        "ferrari",
+        3975
+      ],
+      [
+        "world",
+        3557
+      ],
+      [
+        "team",
+        3556
+      ],
+      [
+        "qualifying",
+        3502
+      ],
+      [
+        "held",
+        3461
+      ],
+      [
+        "position",
+        3457
+      ],
+      [
+        "ahead",
+        3434
+      ],
+      [
+        "teammate",
+        3391
+      ],
+      [
+        "lead",
+        3381
+      ],
+      [
+        "laps",
+        3237
+      ],
+      [
+        "track",
+        3170
+      ],
+      [
+        "mclaren",
+        2976
+      ],
+      [
+        "tyres",
+        2958
+      ]
+    ],
+    "driver": [
+      [
+        "formula",
+        9372
+      ],
+      [
+        "race",
+        8621
+      ],
+      [
+        "season",
+        6311
+      ],
+      [
+        "prix",
+        5956
+      ],
+      [
+        "championship",
+        5892
+      ],
+      [
+        "racing",
+        5638
+      ],
+      [
+        "grand",
+        5337
+      ],
+      [
+        "team",
+        5146
+      ],
+      [
+        "car",
+        5078
+      ],
+      [
+        "driver",
+        4267
+      ],
+      [
+        "finished",
+        3806
+      ],
+      [
+        "second",
+        3408
+      ],
+      [
+        "won",
+        3117
+      ],
+      [
+        "points",
+        3109
+      ],
+      [
+        "place",
+        3005
+      ],
+      [
+        "races",
+        2712
+      ],
+      [
+        "world",
+        2623
+      ],
+      [
+        "drivers",
+        2520
+      ],
+      [
+        "year",
+        2293
+      ],
+      [
+        "time",
+        2209
+      ],
+      [
+        "finish",
+        2132
+      ],
+      [
+        "series",
+        2095
+      ],
+      [
+        "lap",
+        2005
+      ],
+      [
+        "ferrari",
+        1843
+      ],
+      [
+        "driving",
+        1735
+      ],
+      [
+        "win",
+        1633
+      ],
+      [
+        "career",
+        1580
+      ],
+      [
+        "later",
+        1497
+      ],
+      [
+        "following",
+        1484
+      ],
+      [
+        "cars",
+        1474
+      ]
+    ],
+    "team": [
+      [
+        "team",
+        3768
+      ],
+      [
+        "formula",
+        2414
+      ],
+      [
+        "season",
+        2136
+      ],
+      [
+        "car",
+        1723
+      ],
+      [
+        "prix",
+        1636
+      ],
+      [
+        "grand",
+        1517
+      ],
+      [
+        "race",
+        1500
+      ],
+      [
+        "championship",
+        1225
+      ],
+      [
+        "racing",
+        1203
+      ],
+      [
+        "cars",
+        1067
+      ],
+      [
+        "engine",
+        853
+      ],
+      [
+        "driver",
+        745
+      ],
+      [
+        "points",
+        733
+      ],
+      [
+        "new",
+        729
+      ],
+      [
+        "drivers",
+        724
+      ],
+      [
+        "finished",
+        671
+      ],
+      [
+        "year",
+        661
+      ],
+      [
+        "place",
+        597
+      ],
+      [
+        "second",
+        561
+      ],
+      [
+        "won",
+        555
+      ],
+      [
+        "team's",
+        554
+      ],
+      [
+        "races",
+        525
+      ],
+      [
+        "world",
+        510
+      ],
+      [
+        "williams",
+        509
+      ],
+      [
+        "engines",
+        507
+      ],
+      [
+        "time",
+        505
+      ],
+      [
+        "mclaren",
+        494
+      ],
+      [
+        "announced",
+        471
+      ],
+      [
+        "ferrari",
+        458
+      ],
+      [
+        "lotus",
+        457
+      ]
+    ]
+  },
+  "terms_in_most_documents": [
+    [
+      "championship",
+      0.955
+    ],
+    [
+      "prix",
+      0.947
+    ],
+    [
+      "formula",
+      0.947
+    ],
+    [
+      "race",
+      0.946
+    ],
+    [
+      "grand",
+      0.936
+    ],
+    [
+      "driver",
+      0.902
+    ],
+    [
+      "world",
+      0.881
+    ],
+    [
+      "car",
+      0.851
+    ],
+    [
+      "second",
+      0.824
+    ]
+  ],
+  "race_seasons": [
+    1950,
+    2026
+  ],
+  "field_coverage_percent": {
+    "race": {
+      "summary": 100.0,
+      "background": 37.5,
+      "qualifying": 42.3,
+      "race": 85.3,
+      "post_race": 26.9,
+      "other": 11.0
+    },
+    "driver": {
+      "summary": 100.0,
+      "biography": 84.3
+    },
+    "team": {
+      "summary": 100.0,
+      "history": 91.8
+    }
+  },
+  "quality": {
+    "structured_records": {
+      "race": 1162,
+      "driver": 818,
+      "team": 168
+    },
+    "accepted_documents": {
+      "race": 1116,
+      "driver": 719,
+      "team": 147
+    },
+    "rejected": {
+      "too_short": 163,
+      "missing_article": 3
+    },
+    "rejected_by_type": {
+      "race": 46,
+      "driver": 99,
+      "team": 21
+    },
+    "min_words_threshold": 100,
+    "disambiguation_links_fixed": [
+      "Jimmy Davies -> Jimmy Davies (racing driver)",
+      "Tony Crook -> Tony Crook (racing driver)",
+      "Ernie McCoy -> Ernie McCoy (racing driver)",
+      "Jesús Iglesias -> Jesús Iglesias (racing driver)",
+      "Ray Crawford -> Ray Crawford (racing driver)",
+      "Jean Lucas -> Jean Lucas (racing driver)",
+      "Tony Brooks -> Tony Brooks (racing driver)",
+      "Brian Naylor -> Brian Naylor (racing driver)",
+      "Paul England -> Paul England (racing driver)",
+      "Richard Gibson (disambiguation) -> Dick Gibson (racing driver)",
+      "Paul Goldsmith -> Paul Goldsmith (racing driver)",
+      "François Picard -> François Picard (racing driver)",
+      "David Piper -> David Piper (racing driver)",
+      "Trevor Taylor -> Trevor Taylor (racing driver)",
+      "George Constantine -> George Constantine (racing driver)",
+      "Arthur Owen -> Arthur Owen (racing driver)",
+      "Ray Reed -> Ray Reed (racing driver)",
+      "George Eaton -> George Eaton (racing driver)",
+      "Geoffrey Lees -> Geoff Lees (racing driver)",
+      "Julian Bailey -> Julian Bailey (racing driver)",
+      "Paul Belmondo -> Paul Belmondo (racing driver)",
+      "Trevis -> Floyd Trevis",
+      "Epperly -> Quin Epperly",
+      "Gilby -> Gilby Engineering",
+      "Surtees -> Surtees Racing Organisation",
+      "Tecno -> Tecno (motorsport)",
+      "Toyota Racing -> Toyota in Formula One",
+      "Lotus Racing -> Team Lotus (2010–2011)"
+    ]
+  },
+  "top_retirement_reasons": [
+    [
+      "Engine",
+      1889
+    ],
+    [
+      "Accident",
+      977
+    ],
+    [
+      "Collision",
+      810
+    ],
+    [
+      "Spun off",
+      776
+    ],
+    [
+      "Gearbox",
+      751
+    ],
+    [
+      "Suspension",
+      404
+    ],
+    [
+      "Electrical",
+      304
+    ],
+    [
+      "Transmission",
+      299
+    ],
+    [
+      "Retired",
+      293
+    ],
+    [
+      "Brakes",
+      240
+    ],
+    [
+      "Clutch",
+      197
+    ],
+    [
+      "Fuel system",
+      144
+    ],
+    [
+      "Turbo",
+      142
+    ],
+    [
+      "Hydraulics",
+      134
+    ],
+    [
+      "Overheating",
+      117
+    ]
+  ],
+  "top_driver_nationalities": [
+    [
+      "British",
+      142
+    ],
+    [
+      "American",
+      131
+    ],
+    [
+      "Italian",
+      77
+    ],
+    [
+      "French",
+      65
+    ],
+    [
+      "German",
+      41
+    ],
+    [
+      "Brazilian",
+      30
+    ],
+    [
+      "Japanese",
+      19
+    ],
+    [
+      "Swiss",
+      18
+    ],
+    [
+      "Belgian",
+      17
+    ],
+    [
+      "Argentine",
+      17
+    ],
+    [
+      "Dutch",
+      17
+    ],
+    [
+      "Australian",
+      16
+    ],
+    [
+      "South African",
+      16
+    ],
+    [
+      "Austrian",
+      15
+    ],
+    [
+      "Canadian",
+      13
+    ]
+  ],
+  "top_race_countries": [
+    [
+      "Italy",
+      103
+    ],
+    [
+      "USA",
+      83
+    ],
+    [
+      "Germany",
+      78
+    ],
+    [
+      "UK",
+      73
+    ],
+    [
+      "Belgium",
+      71
+    ],
+    [
+      "Monaco",
+      69
+    ],
+    [
+      "Spain",
+      60
+    ],
+    [
+      "France",
+      57
+    ],
+    [
+      "Canada",
+      54
+    ],
+    [
+      "Brazil",
+      52
+    ],
+    [
+      "Japan",
+      42
+    ],
+    [
+      "Hungary",
+      41
+    ],
+    [
+      "Australia",
+      40
+    ],
+    [
+      "Austria",
+      36
+    ],
+    [
+      "Netherlands",
+      27
+    ]
+  ]
+}

@@ -1,0 +1,829 @@
+[
+  {
+    "id": "race_1954_08",
+    "reason": "too_short",
+    "word_count": 87
+  },
+  {
+    "id": "race_1956_05",
+    "reason": "too_short",
+    "word_count": 87
+  },
+  {
+    "id": "race_1956_06",
+    "reason": "too_short",
+    "word_count": 31
+  },
+  {
+    "id": "race_1956_07",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1957_04",
+    "reason": "too_short",
+    "word_count": 31
+  },
+  {
+    "id": "race_1957_08",
+    "reason": "too_short",
+    "word_count": 32
+  },
+  {
+    "id": "race_1958_03",
+    "reason": "too_short",
+    "word_count": 45
+  },
+  {
+    "id": "race_1958_07",
+    "reason": "too_short",
+    "word_count": 77
+  },
+  {
+    "id": "race_1958_10",
+    "reason": "too_short",
+    "word_count": 92
+  },
+  {
+    "id": "race_1960_02",
+    "reason": "too_short",
+    "word_count": 77
+  },
+  {
+    "id": "race_1960_04",
+    "reason": "too_short",
+    "word_count": 92
+  },
+  {
+    "id": "race_1960_06",
+    "reason": "too_short",
+    "word_count": 99
+  },
+  {
+    "id": "race_1960_07",
+    "reason": "too_short",
+    "word_count": 89
+  },
+  {
+    "id": "race_1960_08",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1963_03",
+    "reason": "too_short",
+    "word_count": 80
+  },
+  {
+    "id": "race_1963_05",
+    "reason": "too_short",
+    "word_count": 82
+  },
+  {
+    "id": "race_1964_01",
+    "reason": "too_short",
+    "word_count": 54
+  },
+  {
+    "id": "race_1964_02",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1964_04",
+    "reason": "too_short",
+    "word_count": 88
+  },
+  {
+    "id": "race_1964_05",
+    "reason": "too_short",
+    "word_count": 85
+  },
+  {
+    "id": "race_1964_07",
+    "reason": "too_short",
+    "word_count": 90
+  },
+  {
+    "id": "race_1964_08",
+    "reason": "too_short",
+    "word_count": 77
+  },
+  {
+    "id": "race_1967_06",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1968_05",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1968_07",
+    "reason": "too_short",
+    "word_count": 81
+  },
+  {
+    "id": "race_1969_04",
+    "reason": "too_short",
+    "word_count": 75
+  },
+  {
+    "id": "race_1969_05",
+    "reason": "too_short",
+    "word_count": 82
+  },
+  {
+    "id": "race_1969_08",
+    "reason": "too_short",
+    "word_count": 93
+  },
+  {
+    "id": "race_1971_04",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "race_1972_09",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1973_01",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "race_1973_04",
+    "reason": "too_short",
+    "word_count": 82
+  },
+  {
+    "id": "race_1974_06",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1974_08",
+    "reason": "too_short",
+    "word_count": 42
+  },
+  {
+    "id": "race_1974_12",
+    "reason": "too_short",
+    "word_count": 97
+  },
+  {
+    "id": "race_1974_13",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "race_1976_12",
+    "reason": "too_short",
+    "word_count": 72
+  },
+  {
+    "id": "race_1979_03",
+    "reason": "too_short",
+    "word_count": 69
+  },
+  {
+    "id": "race_1979_05",
+    "reason": "too_short",
+    "word_count": 71
+  },
+  {
+    "id": "race_1979_11",
+    "reason": "too_short",
+    "word_count": 18
+  },
+  {
+    "id": "race_1981_09",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "race_1983_08",
+    "reason": "too_short",
+    "word_count": 82
+  },
+  {
+    "id": "race_1983_11",
+    "reason": "too_short",
+    "word_count": 97
+  },
+  {
+    "id": "race_1995_07",
+    "reason": "too_short",
+    "word_count": 89
+  },
+  {
+    "id": "race_1996_05",
+    "reason": "too_short",
+    "word_count": 97
+  },
+  {
+    "id": "race_2026_07",
+    "reason": "missing_article"
+  },
+  {
+    "id": "driver_harrison",
+    "reason": "too_short",
+    "word_count": 54
+  },
+  {
+    "id": "driver_rol",
+    "reason": "too_short",
+    "word_count": 44
+  },
+  {
+    "id": "driver_pian",
+    "reason": "too_short",
+    "word_count": 79
+  },
+  {
+    "id": "driver_hellings",
+    "reason": "too_short",
+    "word_count": 31
+  },
+  {
+    "id": "driver_holmes",
+    "reason": "too_short",
+    "word_count": 83
+  },
+  {
+    "id": "driver_cantrell",
+    "reason": "too_short",
+    "word_count": 53
+  },
+  {
+    "id": "driver_hirt",
+    "reason": "too_short",
+    "word_count": 40
+  },
+  {
+    "id": "driver_ayulo",
+    "reason": "too_short",
+    "word_count": 71
+  },
+  {
+    "id": "driver_forberg",
+    "reason": "too_short",
+    "word_count": 18
+  },
+  {
+    "id": "driver_mackey",
+    "reason": "too_short",
+    "word_count": 54
+  },
+  {
+    "id": "driver_james",
+    "reason": "too_short",
+    "word_count": 68
+  },
+  {
+    "id": "driver_andre_pilette",
+    "reason": "too_short",
+    "word_count": 63
+  },
+  {
+    "id": "driver_parker",
+    "reason": "too_short",
+    "word_count": 95
+  },
+  {
+    "id": "driver_john_james",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "driver_godia",
+    "reason": "too_short",
+    "word_count": 54
+  },
+  {
+    "id": "driver_grignard",
+    "reason": "too_short",
+    "word_count": 51
+  },
+  {
+    "id": "driver_terra",
+    "reason": "too_short",
+    "word_count": 44
+  },
+  {
+    "id": "driver_rigsby",
+    "reason": "too_short",
+    "word_count": 32
+  },
+  {
+    "id": "driver_fonder",
+    "reason": "too_short",
+    "word_count": 75
+  },
+  {
+    "id": "driver_bob_scott",
+    "reason": "too_short",
+    "word_count": 35
+  },
+  {
+    "id": "driver_laurent",
+    "reason": "too_short",
+    "word_count": 67
+  },
+  {
+    "id": "driver_legat",
+    "reason": "too_short",
+    "word_count": 50
+  },
+  {
+    "id": "driver_bianco",
+    "reason": "too_short",
+    "word_count": 89
+  },
+  {
+    "id": "driver_cantoni",
+    "reason": "too_short",
+    "word_count": 89
+  },
+  {
+    "id": "driver_riess",
+    "reason": "too_short",
+    "word_count": 96
+  },
+  {
+    "id": "driver_niedermayr",
+    "reason": "too_short",
+    "word_count": 69
+  },
+  {
+    "id": "driver_klenk",
+    "reason": "too_short",
+    "word_count": 52
+  },
+  {
+    "id": "driver_klodwig",
+    "reason": "too_short",
+    "word_count": 44
+  },
+  {
+    "id": "driver_heeks",
+    "reason": "too_short",
+    "word_count": 34
+  },
+  {
+    "id": "driver_schoeller",
+    "reason": "too_short",
+    "word_count": 57
+  },
+  {
+    "id": "driver_helfrich",
+    "reason": "too_short",
+    "word_count": 70
+  },
+  {
+    "id": "driver_peters",
+    "reason": "too_short",
+    "word_count": 38
+  },
+  {
+    "id": "driver_birger",
+    "reason": "too_short",
+    "word_count": 93
+  },
+  {
+    "id": "driver_cruz",
+    "reason": "too_short",
+    "word_count": 55
+  },
+  {
+    "id": "driver_mccoy",
+    "reason": "too_short",
+    "word_count": 25
+  },
+  {
+    "id": "driver_jimmy_stewart",
+    "reason": "too_short",
+    "word_count": 71
+  },
+  {
+    "id": "driver_fairman",
+    "reason": "too_short",
+    "word_count": 50
+  },
+  {
+    "id": "driver_nuckey",
+    "reason": "too_short",
+    "word_count": 86
+  },
+  {
+    "id": "driver_fitzau",
+    "reason": "too_short",
+    "word_count": 52
+  },
+  {
+    "id": "driver_scherrer",
+    "reason": "too_short",
+    "word_count": 41
+  },
+  {
+    "id": "driver_mantovani",
+    "reason": "too_short",
+    "word_count": 97
+  },
+  {
+    "id": "driver_loyer",
+    "reason": "too_short",
+    "word_count": 94
+  },
+  {
+    "id": "driver_daponte",
+    "reason": "too_short",
+    "word_count": 63
+  },
+  {
+    "id": "driver_armi",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "driver_pollet",
+    "reason": "too_short",
+    "word_count": 35
+  },
+  {
+    "id": "driver_thorne",
+    "reason": "too_short",
+    "word_count": 59
+  },
+  {
+    "id": "driver_bucci",
+    "reason": "too_short",
+    "word_count": 68
+  },
+  {
+    "id": "driver_uria",
+    "reason": "too_short",
+    "word_count": 61
+  },
+  {
+    "id": "driver_sparken",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "driver_piotti",
+    "reason": "too_short",
+    "word_count": 39
+  },
+  {
+    "id": "driver_gerini",
+    "reason": "too_short",
+    "word_count": 58
+  },
+  {
+    "id": "driver_oscar_gonzalez",
+    "reason": "too_short",
+    "word_count": 50
+  },
+  {
+    "id": "driver_christie",
+    "reason": "too_short",
+    "word_count": 62
+  },
+  {
+    "id": "driver_scotti",
+    "reason": "too_short",
+    "word_count": 34
+  },
+  {
+    "id": "driver_halford",
+    "reason": "too_short",
+    "word_count": 89
+  },
+  {
+    "id": "driver_emery",
+    "reason": "too_short",
+    "word_count": 72
+  },
+  {
+    "id": "driver_milhoux",
+    "reason": "too_short",
+    "word_count": 49
+  },
+  {
+    "id": "driver_mackay-fraser",
+    "reason": "too_short",
+    "word_count": 69
+  },
+  {
+    "id": "driver_naylor",
+    "reason": "too_short",
+    "word_count": 90
+  },
+  {
+    "id": "driver_gibson",
+    "reason": "too_short",
+    "word_count": 43
+  },
+  {
+    "id": "driver_bisch",
+    "reason": "too_short",
+    "word_count": 59
+  },
+  {
+    "id": "driver_guelfi",
+    "reason": "too_short",
+    "word_count": 70
+  },
+  {
+    "id": "driver_picard",
+    "reason": "too_short",
+    "word_count": 65
+  },
+  {
+    "id": "driver_arnold",
+    "reason": "too_short",
+    "word_count": 55
+  },
+  {
+    "id": "driver_amick",
+    "reason": "too_short",
+    "word_count": 65
+  },
+  {
+    "id": "driver_orey",
+    "reason": "too_short",
+    "word_count": 43
+  },
+  {
+    "id": "driver_blanchard",
+    "reason": "too_short",
+    "word_count": 92
+  },
+  {
+    "id": "driver_cade",
+    "reason": "too_short",
+    "word_count": 88
+  },
+  {
+    "id": "driver_larreta",
+    "reason": "too_short",
+    "word_count": 85
+  },
+  {
+    "id": "driver_bonomi",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "driver_munaron",
+    "reason": "too_short",
+    "word_count": 38
+  },
+  {
+    "id": "driver_creus",
+    "reason": "too_short",
+    "word_count": 67
+  },
+  {
+    "id": "driver_drake",
+    "reason": "too_short",
+    "word_count": 94
+  },
+  {
+    "id": "driver_collomb",
+    "reason": "too_short",
+    "word_count": 72
+  },
+  {
+    "id": "driver_bordeu",
+    "reason": "too_short",
+    "word_count": 91
+  },
+  {
+    "id": "driver_starrabba",
+    "reason": "too_short",
+    "word_count": 66
+  },
+  {
+    "id": "driver_bussinello",
+    "reason": "too_short",
+    "word_count": 99
+  },
+  {
+    "id": "driver_chamberlain",
+    "reason": "too_short",
+    "word_count": 76
+  },
+  {
+    "id": "driver_walter",
+    "reason": "too_short",
+    "word_count": 45
+  },
+  {
+    "id": "driver_schroeder",
+    "reason": "too_short",
+    "word_count": 81
+  },
+  {
+    "id": "driver_johnstone",
+    "reason": "too_short",
+    "word_count": 72
+  },
+  {
+    "id": "driver_pieterse",
+    "reason": "too_short",
+    "word_count": 44
+  },
+  {
+    "id": "driver_tingle",
+    "reason": "too_short",
+    "word_count": 98
+  },
+  {
+    "id": "driver_dochnal",
+    "reason": "too_short",
+    "word_count": 97
+  },
+  {
+    "id": "driver_niemann",
+    "reason": "too_short",
+    "word_count": 77
+  },
+  {
+    "id": "driver_prophet",
+    "reason": "too_short",
+    "word_count": 69
+  },
+  {
+    "id": "driver_charlton",
+    "reason": "too_short",
+    "word_count": 92
+  },
+  {
+    "id": "driver_reed",
+    "reason": "too_short",
+    "word_count": 95
+  },
+  {
+    "id": "driver_bassi",
+    "reason": "too_short",
+    "word_count": 55
+  },
+  {
+    "id": "driver_fisher",
+    "reason": "too_short",
+    "word_count": 37
+  },
+  {
+    "id": "driver_hutchison",
+    "reason": "too_short",
+    "word_count": 92
+  },
+  {
+    "id": "driver_jean",
+    "reason": "too_short",
+    "word_count": 59
+  },
+  {
+    "id": "driver_bueno",
+    "reason": "too_short",
+    "word_count": 56
+  },
+  {
+    "id": "driver_tunmer",
+    "reason": "too_short",
+    "word_count": 70
+  },
+  {
+    "id": "driver_magee",
+    "reason": "too_short",
+    "word_count": 82
+  },
+  {
+    "id": "driver_andersson",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "driver_gabbiani",
+    "reason": "too_short",
+    "word_count": 58
+  },
+  {
+    "id": "driver_rothengatter",
+    "reason": "too_short",
+    "word_count": 61
+  },
+  {
+    "id": "driver_schiattarella",
+    "reason": "too_short",
+    "word_count": 71
+  },
+  {
+    "id": "team_adams",
+    "reason": "too_short",
+    "word_count": 90
+  },
+  {
+    "id": "team_wetteroth",
+    "reason": "too_short",
+    "word_count": 37
+  },
+  {
+    "id": "team_olson",
+    "reason": "too_short",
+    "word_count": 22
+  },
+  {
+    "id": "team_ewing",
+    "reason": "too_short",
+    "word_count": 70
+  },
+  {
+    "id": "team_langley",
+    "reason": "too_short",
+    "word_count": 22
+  },
+  {
+    "id": "team_lesovsky",
+    "reason": "too_short",
+    "word_count": 17
+  },
+  {
+    "id": "team_marchese",
+    "reason": "too_short",
+    "word_count": 52
+  },
+  {
+    "id": "team_trevis",
+    "reason": "too_short",
+    "word_count": 73
+  },
+  {
+    "id": "team_pawl",
+    "reason": "too_short",
+    "word_count": 28
+  },
+  {
+    "id": "team_bromme",
+    "reason": "too_short",
+    "word_count": 36
+  },
+  {
+    "id": "team_hall",
+    "reason": "missing_article"
+  },
+  {
+    "id": "team_sherman",
+    "reason": "too_short",
+    "word_count": 63
+  },
+  {
+    "id": "team_turner",
+    "reason": "missing_article"
+  },
+  {
+    "id": "team_pankratz",
+    "reason": "too_short",
+    "word_count": 33
+  },
+  {
+    "id": "team_phillips",
+    "reason": "too_short",
+    "word_count": 23
+  },
+  {
+    "id": "team_vhristensen",
+    "reason": "too_short",
+    "word_count": 48
+  },
+  {
+    "id": "team_elder",
+    "reason": "too_short",
+    "word_count": 29
+  },
+  {
+    "id": "team_meskowski",
+    "reason": "too_short",
+    "word_count": 20
+  },
+  {
+    "id": "team_lds",
+    "reason": "too_short",
+    "word_count": 86
+  },
+  {
+    "id": "team_scirocco",
+    "reason": "too_short",
+    "word_count": 63
+  },
+  {
+    "id": "team_protos",
+    "reason": "too_short",
+    "word_count": 80
+  }
+]
