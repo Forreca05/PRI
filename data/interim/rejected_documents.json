@@ -825,5 +825,10 @@
     "id": "team_protos",
     "reason": "too_short",
     "word_count": 80
+  },
+  {
+    "id": "circuit_pedralbes",
+    "reason": "too_short",
+    "word_count": 97
   }
 ]

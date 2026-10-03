@@ -16,15 +16,15 @@ import pandas as pd
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 from build_documents import TEXT_FIELDS
-from utils import (ANALYSIS, DOCUMENTS_PATH, DRIVERS_STRUCTURED_PATH, MIN_WORDS,
-                   RACES_STRUCTURED_PATH, RAW_WIKIPEDIA, REJECTED_PATH,
+from utils import (ANALYSIS, CIRCUITS_STRUCTURED_PATH, DOCUMENTS_PATH, DRIVERS_STRUCTURED_PATH,
+                   MIN_WORDS, RACES_STRUCTURED_PATH, RAW_WIKIPEDIA, REJECTED_PATH,
                    TEAMS_STRUCTURED_PATH, read_json, safe_filename, write_json)
 
 KINDS = list(TEXT_FIELDS)
 TOKEN = re.compile(r"[a-zà-ÿ]+(?:'[a-z]+)?")
 
 plt.rcParams.update({'figure.dpi': 150, 'axes.spines.top': False, 'axes.spines.right': False})
-COLORS = {'race': '#2a6fdb', 'driver': '#e8793a', 'team': '#1f9e74'}
+COLORS = {'race': '#2a6fdb', 'driver': '#e8793a', 'team': '#1f9e74', 'circuit': '#9b59b6'}
 
 
 def save(name: str):
@@ -46,7 +46,7 @@ def word_stats(series: pd.Series) -> dict:
 
 
 def plot_word_counts(df: pd.DataFrame):
-    fig, axes = plt.subplots(1, 3, figsize=(13, 3.5))
+    fig, axes = plt.subplots(1, len(KINDS), figsize=(4.4 * len(KINDS), 3.5))
     for ax, kind in zip(axes, KINDS):
         values = df[df['type'] == kind]['word_count']
         ax.hist(values, bins=np.logspace(np.log10(MIN_WORDS), np.log10(values.max()), 30), color=COLORS[kind])
@@ -116,7 +116,7 @@ def plot_heaps(docs: list):
 
 
 def plot_top_terms(frequencies: dict):
-    fig, axes = plt.subplots(1, 3, figsize=(14, 4.5))
+    fig, axes = plt.subplots(1, len(KINDS), figsize=(4.7 * len(KINDS), 4.5))
     for ax, kind in zip(axes, KINDS):
         terms, counts = zip(*frequencies[kind].most_common(20))
         ax.barh(terms[::-1], counts[::-1], color=COLORS[kind])
@@ -135,7 +135,7 @@ def plot_bar(counter: Counter, title: str, name: str, color: str, n: int = 15):
 def quality_report(docs: list) -> dict:
     rejected = read_json(REJECTED_PATH)
     structured = {'race': read_json(RACES_STRUCTURED_PATH), 'driver': read_json(DRIVERS_STRUCTURED_PATH),
-                  'team': read_json(TEAMS_STRUCTURED_PATH)}
+                  'team': read_json(TEAMS_STRUCTURED_PATH), 'circuit': read_json(CIRCUITS_STRUCTURED_PATH)}
     disambiguations = []
     for kind, records in structured.items():
         for record in records:

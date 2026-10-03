@@ -2,9 +2,10 @@
   "documents": {
     "race": 1116,
     "driver": 719,
-    "team": 147
+    "team": 147,
+    "circuit": 76
   },
-  "total_documents": 1982,
+  "total_documents": 2058,
   "words_per_document": {
     "race": {
       "count": 1116.0,
@@ -35,12 +36,22 @@
       "50%": 1082.0,
       "75%": 2658.5,
       "max": 14152.0
+    },
+    "circuit": {
+      "count": 76.0,
+      "mean": 1917.7,
+      "std": 2222.4,
+      "min": 104.0,
+      "25%": 634.5,
+      "50%": 1238.0,
+      "75%": 1984.0,
+      "max": 11931.0
     }
   },
-  "total_tokens": 2650674,
-  "vocabulary_size": 32506,
-  "hapax_legomena": 11826,
-  "stopword_token_ratio": 0.452,
+  "total_tokens": 2788503,
+  "vocabulary_size": 34348,
+  "hapax_legomena": 12582,
+  "stopword_token_ratio": 0.45,
   "top_terms": {
     "race": [
       [
@@ -407,36 +418,158 @@
         "lotus",
         457
       ]
+    ],
+    "circuit": [
+      [
+        "circuit",
+        1378
+      ],
+      [
+        "race",
+        1255
+      ],
+      [
+        "prix",
+        1206
+      ],
+      [
+        "formula",
+        1203
+      ],
+      [
+        "grand",
+        1199
+      ],
+      [
+        "championship",
+        1171
+      ],
+      [
+        "track",
+        853
+      ],
+      [
+        "series",
+        730
+      ],
+      [
+        "world",
+        673
+      ],
+      [
+        "racing",
+        624
+      ],
+      [
+        "car",
+        559
+      ],
+      [
+        "cup",
+        375
+      ],
+      [
+        "fia",
+        353
+      ],
+      [
+        "turn",
+        350
+      ],
+      [
+        "cars",
+        322
+      ],
+      [
+        "event",
+        312
+      ],
+      [
+        "straight",
+        293
+      ],
+      [
+        "held",
+        285
+      ],
+      [
+        "new",
+        278
+      ],
+      [
+        "international",
+        277
+      ],
+      [
+        "european",
+        277
+      ],
+      [
+        "won",
+        267
+      ],
+      [
+        "drivers",
+        265
+      ],
+      [
+        "time",
+        252
+      ],
+      [
+        "motorcycle",
+        251
+      ],
+      [
+        "corner",
+        239
+      ],
+      [
+        "year",
+        238
+      ],
+      [
+        "races",
+        235
+      ],
+      [
+        "second",
+        234
+      ],
+      [
+        "used",
+        223
+      ]
     ]
   },
   "terms_in_most_documents": [
     [
       "championship",
-      0.955
+      0.953
     ],
     [
       "prix",
-      0.947
+      0.948
     ],
     [
       "race",
-      0.946
+      0.948
     ],
     [
       "formula",
-      0.945
+      0.947
     ],
     [
       "grand",
-      0.936
+      0.938
     ],
     [
       "driver",
-      0.902
+      0.889
     ],
     [
       "world",
-      0.881
+      0.882
     ],
     [
       "car",
@@ -444,7 +577,7 @@
     ],
     [
       "second",
-      0.824
+      0.82
     ]
   ],
   "race_seasons": [
@@ -467,27 +600,37 @@
     "team": {
       "summary": 100.0,
       "history": 91.8
+    },
+    "circuit": {
+      "summary": 100.0,
+      "history": 82.9,
+      "layout": 53.9,
+      "events": 82.9,
+      "other": 34.2
     }
   },
   "quality": {
     "structured_records": {
       "race": 1162,
       "driver": 818,
-      "team": 168
+      "team": 168,
+      "circuit": 77
     },
     "accepted_documents": {
       "race": 1116,
       "driver": 719,
-      "team": 147
+      "team": 147,
+      "circuit": 76
     },
     "rejected": {
-      "too_short": 163,
+      "too_short": 164,
       "missing_article": 3
     },
     "rejected_by_type": {
       "race": 46,
       "driver": 99,
-      "team": 21
+      "team": 21,
+      "circuit": 1
     },
     "min_words_threshold": 100,
     "disambiguation_links_fixed": [

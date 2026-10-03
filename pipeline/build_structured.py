@@ -1,9 +1,10 @@
-"""Step 2: join the Jolpica tables into one structured record per race, driver and team.
+"""Step 2: join the Jolpica tables into one structured record per race, driver, team and circuit.
 
 Jolpica schema (only the parts used here):
     season 1-* round 1-* session (type 'R' = race) 1-* sessionentry
     round 1-* roundentry *-1 teamdriver *-1 driver / team
     sessionentry -> roundentry links a race result to a driver and a team
+    round *-1 circuit
 
 Jolpica has one team row per chassis-engine name ('Cooper', 'Cooper-Climax',
 'Cooper-Maserati'...), several pointing to the same Wikipedia article. A team
@@ -15,12 +16,17 @@ from datetime import date
 
 import pandas as pd
 
-from utils import (DRIVERS_STRUCTURED_PATH, RACES_STRUCTURED_PATH, RAW_JOLPICA,
-                   TEAMS_STRUCTURED_PATH, wikipedia_title, write_json)
+from utils import (CIRCUITS_STRUCTURED_PATH, DRIVERS_STRUCTURED_PATH, RACES_STRUCTURED_PATH,
+                   RAW_JOLPICA, TEAMS_STRUCTURED_PATH, wikipedia_title, write_json)
 
 # sessionentry.status codes, inferred from the 'detail' column
 STATUS = {0: 'finished', 1: 'lapped', 10: 'accident', 11: 'mechanical', 20: 'disqualified', 30: 'did_not_start'}
 RETIRED = {'accident', 'mechanical'}
+
+# Jolpica links that point to the wrong article (circuit reference -> correct article)
+CIRCUIT_WIKIPEDIA_FIXES = {
+    'long_beach': 'https://en.wikipedia.org/wiki/Long_Beach_Street_Circuit',  # was the city
+}
 
 
 def load(table: str) -> pd.DataFrame:
@@ -51,7 +57,7 @@ def race_results() -> pd.DataFrame:
     rounds = load('round').rename(columns={'id': 'round_id', 'name': 'race_name', 'wikipedia': 'race_wikipedia'})
     rounds = rounds[rounds['is_cancelled'] == 'f']
     season = load('season').rename(columns={'id': 'season_id'})[['season_id', 'year']]
-    circuit = load('circuit').rename(columns={'id': 'circuit_id', 'name': 'circuit_name'})
+    circuit = load('circuit').rename(columns={'id': 'circuit_id', 'name': 'circuit_name', 'reference': 'circuit_ref'})
 
     entry = load('sessionentry')
     round_entry = load('roundentry').rename(columns={'id': 'round_entry_id'})
@@ -63,7 +69,7 @@ def race_results() -> pd.DataFrame:
     df = (entry.merge(races, on='session_id')
           .merge(rounds[['round_id', 'race_name', 'number', 'date', 'season_id', 'circuit_id', 'race_wikipedia']], on='round_id')
           .merge(season, on='season_id')
-          .merge(circuit[['circuit_id', 'circuit_name', 'locality', 'country']], on='circuit_id')
+          .merge(circuit[['circuit_id', 'circuit_ref', 'circuit_name', 'locality', 'country']], on='circuit_id')
           .merge(round_entry[['round_entry_id', 'team_driver_id']], on='round_entry_id')
           .merge(team_driver, on='team_driver_id')
           .merge(driver[['driver_id', 'driver_ref', 'driver_name']], on='driver_id')
@@ -91,6 +97,7 @@ def build_races(results: pd.DataFrame) -> list:
             'round': int(number),
             'date': first['date'],
             'circuit': first['circuit_name'],
+            'circuit_id': f'circuit_{first["circuit_ref"]}',
             'locality': first['locality'],
             'country': first['country'],
             'winner': group[group['position'] == 1]['driver_name'].tolist(),
@@ -206,12 +213,49 @@ def build_teams(results: pd.DataFrame) -> list:
     return records
 
 
+def build_circuits(results: pd.DataFrame) -> list:
+    circuit = load('circuit')
+
+    records = []
+    for row in circuit.itertuples():
+        races = results[results['circuit_id'] == row.id]
+        if races.empty:
+            continue
+        per_race = races.groupby(['year', 'number'])
+        url = CIRCUIT_WIKIPEDIA_FIXES.get(row.reference, row.wikipedia)
+        winners = races[races['position'] == 1].sort_values('date')['driver_name']
+        wins = winners.groupby(winners, sort=False).size().sort_values(ascending=False, kind='stable')
+
+        records.append({
+            'id': f'circuit_{row.reference}',
+            'type': 'circuit',
+            'title': row.name,
+            'locality': row.locality,
+            'country': row.country,
+            'latitude': float(row.latitude),
+            'longitude': float(row.longitude),
+            'altitude': int(row.altitude),
+            'first_season': int(races['year'].min()),
+            'last_season': int(races['year'].max()),
+            'seasons': sorted(int(y) for y in races['year'].unique()),
+            'race_entries': int(per_race.ngroups),
+            'grands_prix': races.sort_values('date')['race_name'].unique().tolist(),
+            # Same 'name: value' format as race retirements; ties are ordered by first win
+            'most_wins': [f'{driver}: {count}' for driver, count in wins.head(5).items()],
+            'wikipedia_url': url,
+            'wikipedia_title': wikipedia_title(url),
+        })
+    return records
+
+
 if __name__ == '__main__':
     results = race_results()
     races = build_races(results)
     drivers = build_drivers(results)
     team_records = build_teams(results)
+    circuits = build_circuits(results)
     write_json(RACES_STRUCTURED_PATH, races)
     write_json(DRIVERS_STRUCTURED_PATH, drivers)
     write_json(TEAMS_STRUCTURED_PATH, team_records)
-    print(f'{len(races)} races, {len(drivers)} drivers, {len(team_records)} teams')
+    write_json(CIRCUITS_STRUCTURED_PATH, circuits)
+    print(f'{len(races)} races, {len(drivers)} drivers, {len(team_records)} teams, {len(circuits)} circuits')

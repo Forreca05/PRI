@@ -1,13 +1,14 @@
-"""Step 3: download the Wikipedia article (wikitext) for every race, driver and team.
+"""Step 3: download the Wikipedia article (wikitext) for every race, driver, team and circuit.
 
 Uses the MediaWiki Action API with prop=revisions, which accepts up to 50 titles
-per request, so the ~2150 articles need only ~110 requests (Wikimedia heavily
+per request, so the ~2230 articles need only ~115 requests (Wikimedia heavily
 rate-limits anonymous clients that send one request per page). Redirects are
 followed, and the page id / revision id are stored so the exact version of
 each article can be retrieved again.
 
 Each article is cached as data/raw/wikipedia/<type>/<document id>.json, so
-re-running the step only downloads what is missing.
+re-running the step only downloads what is missing or what a record now links
+to a different article.
 """
 import os
 import re
@@ -16,9 +17,9 @@ import time
 
 import requests
 
-from utils import (DRIVERS_STRUCTURED_PATH, RACES_STRUCTURED_PATH, RAW_WIKIPEDIA,
-                   TEAMS_STRUCTURED_PATH, USER_AGENT, WIKIPEDIA_API, read_json,
-                   safe_filename, write_json)
+from utils import (CIRCUITS_STRUCTURED_PATH, DRIVERS_STRUCTURED_PATH, RACES_STRUCTURED_PATH,
+                   RAW_WIKIPEDIA, TEAMS_STRUCTURED_PATH, USER_AGENT, WIKIPEDIA_API,
+                   read_json, safe_filename, write_json)
 
 BATCH_SIZE = 20  # keeps each response well below the API's size limit
 DISAMBIGUATION = re.compile(r'\{\{\s*(disambiguation|disambig|dab|hndis|human name disambiguation)\b', re.I)
@@ -127,7 +128,15 @@ def collect(records: list, kind: str):
     os.makedirs(folder, exist_ok=True)
 
     path = lambda record: os.path.join(folder, safe_filename(record['id']) + '.json')
-    pending = [record for record in records if not os.path.exists(path(record))]
+
+    def is_cached(record) -> bool:
+        if not os.path.exists(path(record)):
+            return False
+        article = read_json(path(record))
+        # A resolved disambiguation was requested under the entry's title, not the record's
+        return article['requested_title'] == record['wikipedia_title'] or 'disambiguation_resolved_from' in article
+
+    pending = [record for record in records if not is_cached(record)]
 
     for start in range(0, len(pending), BATCH_SIZE):
         batch = pending[start:start + BATCH_SIZE]
@@ -143,7 +152,7 @@ def collect(records: list, kind: str):
 
 if __name__ == '__main__':
     for path, kind in [(RACES_STRUCTURED_PATH, 'race'), (DRIVERS_STRUCTURED_PATH, 'driver'),
-                       (TEAMS_STRUCTURED_PATH, 'team')]:
+                       (TEAMS_STRUCTURED_PATH, 'team'), (CIRCUITS_STRUCTURED_PATH, 'circuit')]:
         records = read_json(path)
         collect(records, kind)
         resolve_disambiguations(records, kind)

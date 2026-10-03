@@ -6,27 +6,32 @@ standings...) are dropped together with their subsections, and the remaining
 top-level sections are mapped to fixed fields so that every document of the
 same type has the same schema:
 
-    race   -> summary, background, qualifying, race, post_race, other
-    driver -> summary, biography
-    team   -> summary, history
+    race    -> summary, background, qualifying, race, post_race, other
+    driver  -> summary, biography
+    team    -> summary, history
+    circuit -> summary, history, layout, events, other
 
 Documents whose article is missing, is shared with another record, or has fewer
 than MIN_WORDS words are rejected (and saved with the reason, for the report).
+
+The collection is written as JSON and as CSV (lists joined with ' | ').
 """
+import csv
 import os
 import re
 import unicodedata
 from collections import Counter
 
-from utils import (DOCUMENTS_PATH, DRIVERS_STRUCTURED_PATH, MIN_WORDS,
-                   RACES_STRUCTURED_PATH, RAW_WIKIPEDIA, REJECTED_PATH,
-                   TEAMS_STRUCTURED_PATH, read_json, safe_filename, write_json)
+from utils import (CIRCUITS_STRUCTURED_PATH, DOCUMENTS_CSV_PATH, DOCUMENTS_PATH,
+                   DRIVERS_STRUCTURED_PATH, MIN_WORDS, RACES_STRUCTURED_PATH, RAW_WIKIPEDIA,
+                   REJECTED_PATH, TEAMS_STRUCTURED_PATH, read_json, safe_filename, write_json)
 from wikitext import HEADING, wikitext_to_text
 
 TEXT_FIELDS = {
     'race': ['summary', 'background', 'qualifying', 'race', 'post_race', 'other'],
     'driver': ['summary', 'biography'],
     'team': ['summary', 'history'],
+    'circuit': ['summary', 'history', 'layout', 'events', 'other'],
 }
 
 # Sections that hold no useful prose once tables are stripped
@@ -42,6 +47,21 @@ RACE_FIELDS = [
     ('qualifying', ['qualif', 'practice', 'time trial']),
     ('race', ['race', 'report', 'sprint', 'summary']),
 ]
+
+# Circuit sections, same rule. 'Layout history' is about the track, 'Circuit history' about the
+# venue, so the generic 'circuit' / 'track' keywords are only checked last
+CIRCUIT_FIELDS = [
+    ('layout', ['layout', 'configuration', 'lap in', 'lap of', 'descri', 'characteristic', 'design',
+                'modif', 'facilit', 'corner', 'turn', 'dimension']),
+    ('history', ['history', 'develop', 'construct', 'final years', 'financial', 'modern', 'original',
+                 'fatal', 'death', 'accident', 'incident', 'recent', 'legacy', 'cancel', 'background']),
+    ('events', ['event', 'motorsport', 'formula one', 'grand prix', 'racing', 'race', 'winner',
+                'concert', 'music', 'air show', 'series', 'competition', 'sport', 'activit', 'motogp',
+                'supercars', 'dtm', 'rallycross', 'cycling', 'tour de']),
+    ('layout', ['circuit', 'track']),
+]
+
+SECTION_FIELDS = {'race': RACE_FIELDS, 'circuit': CIRCUIT_FIELDS}
 
 
 def clean(text: str) -> str:
@@ -63,9 +83,12 @@ def is_dropped(title: str) -> bool:
     return any(key in title for key in DROP)
 
 
-def race_field(title: str) -> str:
+def section_field(title: str, kind: str) -> str:
+    """Field of a top-level section: by keyword for races and circuits, a single field otherwise."""
+    if kind not in SECTION_FIELDS:
+        return TEXT_FIELDS[kind][1]
     title = title.lower()
-    for field, keys in RACE_FIELDS:
+    for field, keys in SECTION_FIELDS[kind]:
         if any(key in title for key in keys):
             return field
     return 'other'
@@ -89,11 +112,11 @@ def text_fields(text: str, kind: str, section_log: Counter) -> dict:
         if moved_level is not None and level <= moved_level:
             moved_field, moved_level = None, None
         if level == 2:
-            field = race_field(title) if kind == 'race' else TEXT_FIELDS[kind][1]
+            field = section_field(title, kind)
             section_log[(kind, field, title)] += 1
         elif field is None:
             continue
-        elif kind == 'race' and moved_field is None and race_field(title) == 'post_race':
+        elif kind == 'race' and moved_field is None and section_field(title, kind) == 'post_race':
             # 'Post-race' is often a subsection of 'Race'; it belongs to post_race with its children
             moved_field, moved_level = 'post_race', level
 
@@ -137,36 +160,52 @@ def build(records: list, kind: str, section_log: Counter) -> tuple:
     return accepted, rejected
 
 
-def link(races: list, drivers: list, teams: list):
-    """Keep only links to documents present in the collection, and add the
-    reverse links from drivers and teams to the races they took part in."""
-    present = {doc['id'] for doc in races + drivers + teams}
+def link(races: list, drivers: list, teams: list, circuits: list):
+    """Keep only links to documents present in the collection, and add the reverse
+    links from drivers, teams and circuits to the races they took part in / hosted."""
+    present = {doc['id'] for doc in races + drivers + teams + circuits}
     for doc in races + drivers + teams:
         for key in ['driver_ids', 'team_ids']:
             if key in doc:
                 doc[key] = [i for i in doc[key] if i in present]
-
-    races_of = {doc['id']: [] for doc in drivers + teams}
     for race in races:
-        for other in race['driver_ids'] + race['team_ids']:
-            races_of[other].append(race['id'])
-    for doc in drivers + teams:
+        if race['circuit_id'] not in present:
+            race['circuit_id'] = None
+
+    races_of = {doc['id']: [] for doc in drivers + teams + circuits}
+    for race in races:
+        for other in race['driver_ids'] + race['team_ids'] + [race['circuit_id']]:
+            if other is not None:
+                races_of[other].append(race['id'])
+    for doc in drivers + teams + circuits:
         doc['race_ids'] = races_of[doc['id']]
+
+
+def write_csv(path: str, documents: list):
+    """One column per field of any document type; empty where the field does not apply."""
+    columns = list(dict.fromkeys(key for doc in documents for key in doc))
+    with open(path, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=columns)
+        writer.writeheader()
+        for doc in documents:
+            writer.writerow({key: ' | '.join(map(str, value)) if isinstance(value, list) else
+                             '' if value is None else value for key, value in doc.items()})
 
 
 if __name__ == '__main__':
     section_log = Counter()
     documents, rejected = {}, []
     for kind, path in [('race', RACES_STRUCTURED_PATH), ('driver', DRIVERS_STRUCTURED_PATH),
-                       ('team', TEAMS_STRUCTURED_PATH)]:
+                       ('team', TEAMS_STRUCTURED_PATH), ('circuit', CIRCUITS_STRUCTURED_PATH)]:
         documents[kind], rejected_kind = build(read_json(path), kind, section_log)
         rejected += rejected_kind
-        print(f'{kind + "s:":8} {len(documents[kind])} accepted, {len(rejected_kind)} rejected')
-    link(documents['race'], documents['driver'], documents['team'])
+        print(f'{kind + "s:":9} {len(documents[kind])} accepted, {len(rejected_kind)} rejected')
+    link(documents['race'], documents['driver'], documents['team'], documents['circuit'])
 
-    collection = documents['race'] + documents['driver'] + documents['team']
+    collection = documents['race'] + documents['driver'] + documents['team'] + documents['circuit']
     write_json(DOCUMENTS_PATH, collection)
+    write_csv(DOCUMENTS_CSV_PATH, collection)
     write_json(REJECTED_PATH, rejected)
     write_json(os.path.join(os.path.dirname(REJECTED_PATH), 'section_mapping.json'),
                [{'type': k, 'field': f, 'section': s, 'count': n} for (k, f, s), n in section_log.most_common()])
-    print(f'total:   {len(collection)} documents -> {DOCUMENTS_PATH}')
+    print(f'total:    {len(collection)} documents -> {DOCUMENTS_PATH}')

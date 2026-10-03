@@ -1,18 +1,18 @@
 # F1 Search — PRI 2026/27
 
-Sistema de pesquisa sobre **corridas, pilotos e equipas de Fórmula 1**. Junta duas
+Sistema de pesquisa sobre **corridas, pilotos, equipas e circuitos de Fórmula 1**. Junta duas
 fontes de dados distintas:
 
 | Fonte | Tipo | O que dá |
 |---|---|---|
 | [Jolpica F1](https://github.com/jolpica/jolpica-f1) (sucessora da Ergast API) | **estruturada** (CSV) | resultados, grelhas, abandonos, títulos, equipas… desde 1950 |
-| [Wikipedia (EN)](https://en.wikipedia.org) | **texto** (artigos) | a narrativa de cada corrida, biografia de cada piloto, história de cada equipa |
+| [Wikipedia (EN)](https://en.wikipedia.org) | **texto** (artigos) | a narrativa de cada corrida, biografia de cada piloto, história de cada equipa e de cada circuito |
 
 A **ligação** entre as duas é o link da Wikipedia que a própria Jolpica guarda para
-cada corrida, piloto e equipa.
+cada corrida, piloto, equipa e circuito.
 
-**Coleção final: 1982 documentos** (1116 corridas, 719 pilotos, 147 equipas),
-2,65 milhões de palavras, vocabulário de 32 502 termos.
+**Coleção final: 2058 documentos** (1116 corridas, 719 pilotos, 147 equipas,
+76 circuitos), 2,79 milhões de palavras, vocabulário de 34 348 termos.
 
 ---
 
@@ -46,7 +46,7 @@ Cada passo também pode correr sozinho:
 | Comando | O que faz |
 |---|---|
 | `make collect` | passo 1 — descarrega os dados da Jolpica |
-| `make structure` | passo 2 — constrói corridas, pilotos e equipas |
+| `make structure` | passo 2 — constrói corridas, pilotos, equipas e circuitos |
 | `make wikipedia` | passo 3 — descarrega os artigos da Wikipedia |
 | `make documents` | passo 4 — constrói a coleção final |
 | `make analyze` | passo 5 — estatísticas e gráficos |
@@ -74,21 +74,23 @@ Projeto/
 └── data/
     ├── raw/                   ← dados ORIGINAIS, nunca alterados
     │   ├── jolpica/           ← 11 CSVs + metadata.json (que versão do dump foi usada)
-    │   └── wikipedia/         ← race/, driver/, team/ — um JSON por artigo
+    │   └── wikipedia/         ← race/, driver/, team/, circuit/ — um JSON por artigo
     ├── interim/               ← resultados intermédios e registos de decisões
     │   ├── races_structured.json
     │   ├── drivers_structured.json
     │   ├── teams_structured.json
+    │   ├── circuits_structured.json
     │   ├── rejected_documents.json   ← o que foi excluído e porquê
     │   └── section_mapping.json      ← que secção da Wikipedia foi para que campo
     ├── processed/
-    │   └── documents.json     ← ★ A COLEÇÃO FINAL (é isto que vai para o Solr no M2)
+    │   ├── documents.json     ← ★ A COLEÇÃO FINAL (é isto que vai para o Solr no M2)
+    │   └── documents.csv      ← a mesma coleção em CSV (listas separadas por " | ")
     └── analysis/
         ├── stats.json         ← todos os números para o relatório
         └── *.png              ← 9 gráficos
 ```
 
-> **Onde está o texto?** Só em `data/processed/documents.json`. Os ficheiros
+> **Onde está o texto?** Só em `data/processed/` (`documents.json` / `.csv`). Os ficheiros
 > `interim/*_structured.json` têm apenas os dados da Jolpica e o link da Wikipedia:
 > o texto é descarregado no passo 3 e juntado no passo 4. Por exemplo, o documento
 > `driver_leclerc` em `processed/` tem os mesmos campos mais `summary` e `biography`
@@ -111,10 +113,10 @@ as secções foram mapeadas), para poderem ser justificadas no relatório.
                                           2. build_structured
                                   (junta tabelas; agrupa equipas)
                                                    │
-                       interim/{races,drivers,teams}_structured.json
+                interim/{races,drivers,teams,circuits}_structured.json
                                   │   (cada registo tem o link da Wikipedia)
                                   ▼
- WIKIPEDIA (API) ◄──── 3. collect_wikipedia ───► raw/wikipedia/{race,driver,team}/*.json
+ WIKIPEDIA (API) ◄──── 3. collect_wikipedia ───► raw/wikipedia/{race,driver,team,circuit}/*.json
                        (lotes de 20; resolve páginas de desambiguação)
                                   │
                                   ▼
@@ -122,7 +124,7 @@ as secções foram mapeadas), para poderem ser justificadas no relatório.
      (wikitext → texto; secções → campos; filtro ≥ 100 palavras; ligações)
                                   │
                                   ▼
-                       processed/documents.json
+                     processed/documents.{json,csv}
                                   │
                                   ▼
                    5. analyze ──► analysis/stats.json + gráficos
@@ -144,18 +146,25 @@ as secções foram mapeadas), para poderem ser justificadas no relatório.
 ### Passo 2 — `build_structured.py`: juntar as tabelas
 
 A Jolpica é uma base de dados relacional. O script faz os *joins* para chegar a um
-registo por corrida, por piloto e por equipa:
+registo por corrida, por piloto, por equipa e por circuito:
 
 ```
 season ─< round ─< session (tipo 'R' = corrida) ─< sessionentry   (um resultado)
 round  ─< roundentry >─ teamdriver >─ driver
                                   └─> team
+round  >─ circuit
 ```
 
 - **Corrida**: vencedor, pole, pódio, volta mais rápida, nº de partidas e de
   chegadas, abandonos com motivo (`"Sergio Pérez: Engine"`), pilotos e equipas.
 - **Piloto**: vitórias, pódios, poles, títulos (e anos), equipas, épocas.
 - **Equipa**: o mesmo, com títulos de **construtores**.
+- **Circuito**: localização (cidade, país, coordenadas, altitude), épocas e nº de
+  GPs realizados, nomes dos GPs ("Italian Grand Prix") e os pilotos com mais
+  vitórias lá (`"Ayrton Senna: 6"` no Mónaco).
+- **Link errado corrigido**: na Jolpica, o circuito de Long Beach aponta para o
+  artigo da *cidade*; é trocado por "Long Beach Street Circuit"
+  (`CIRCUIT_WIKIPEDIA_FIXES`).
 - **Equipas agrupadas**: a Jolpica tem uma linha por combinação chassis‑motor
   ("Cooper", "Cooper‑Climax", "Cooper‑Maserati"…), e várias apontam para o mesmo
   artigo. Cada equipa da coleção corresponde a **um artigo**, com a lista de nomes
@@ -170,11 +179,11 @@ round  ─< roundentry >─ teamdriver >─ driver
 
 - Para cada registo, usa o link da Wikipedia e descarrega o artigo em **wikitext**
   (o texto-fonte da Wikipedia), mais o `pageid` e o `revid` (a versão exata).
-- **Lotes de 20 artigos por pedido** (~110 pedidos em vez de ~2150): a Wikipedia
+- **Lotes de 20 artigos por pedido** (~115 pedidos em vez de ~2230): a Wikipedia
   bloqueia clientes anónimos que fazem um pedido por página (HTTP 429). O script
   também espera o tempo que o servidor pede (`Retry-After`).
 - **Cache**: cada artigo fica num ficheiro em `raw/wikipedia/`. Voltar a correr só
-  descarrega o que falta.
+  descarrega o que falta, ou o que passou a ter outro link (ex.: Long Beach).
 - **Páginas de desambiguação**: alguns links da Jolpica levam a páginas do tipo
   *"Tony Brooks may refer to…"*. O script deteta-as e escolhe a entrada certa, por
   esta ordem de prioridade:
@@ -199,7 +208,10 @@ round  ─< roundentry >─ teamdriver >─ driver
    | race | `summary` (introdução), `background`, `qualifying`, `race`, `post_race`, `other` |
    | driver | `summary`, `biography` |
    | team | `summary`, `history` |
+   | circuit | `summary`, `history`, `layout` (traçado), `events` (provas e eventos), `other` |
 
+   Nos circuitos, "Layout history" vai para `layout` e "Circuit history" para
+   `history`: as palavras genéricas "circuit" / "track" só são testadas no fim.
    Secções sem prosa (References, Classification, Championship standings, Racing
    record…) são descartadas **com as suas subsecções**. Uma subsecção "Post-race"
    dentro de "Race" vai para `post_race`.
@@ -207,7 +219,9 @@ round  ─< roundentry >─ teamdriver >─ driver
    rejeitados, tal como artigos inexistentes ou repetidos. Tudo fica em
    `interim/rejected_documents.json` com o motivo.
 4. **Ligações**: corridas ↔ pilotos ↔ equipas, nos dois sentidos, só entre
-   documentos que existem na coleção.
+   documentos que existem na coleção; corridas ↔ circuitos (`circuit_id` /
+   `race_ids`).
+5. **Exportação**: `documents.json` e `documents.csv`.
 
 ### Passo 5 — `analyze.py`: caracterização
 
@@ -230,9 +244,9 @@ Gera `analysis/stats.json` e os gráficos:
 ## 5. Modelo conceptual
 
 ```
-        ┌──────────┐    participa em (N:M)    ┌──────────┐
-        │  Driver  │◄────────────────────────►│   Race   │
-        └────┬─────┘  (grelha, posição,        └────┬─────┘
+        ┌──────────┐    participa em (N:M)    ┌──────────┐   foi em (N:1)   ┌──────────┐
+        │  Driver  │◄────────────────────────►│   Race   │─────────────────►│ Circuit  │
+        └────┬─────┘  (grelha, posição,        └────┬─────┘                  └──────────┘
              │         motivo de abandono)          │
              │ correu por (N:M)                     │ teve (N:M)
              ▼                                      ▼
@@ -245,15 +259,16 @@ No JSON, as relações são listas de ids:
 
 | Documento | Liga a |
 |---|---|
-| race | `driver_ids`, `team_ids` |
+| race | `driver_ids`, `team_ids`, `circuit_id` |
 | driver | `race_ids`, `team_ids` |
 | team | `race_ids`, `driver_ids` |
+| circuit | `race_ids` |
 
 ---
 
 ## 6. Os documentos
 
-Todos os documentos estão em `data/processed/documents.json`. Cada um tem:
+Todos os documentos estão em `data/processed/documents.json` (e `.csv`). Cada um tem:
 
 - **campos estruturados** (da Jolpica) — para filtros e *boosts* no Solr;
 - **campos de texto** (da Wikipedia) — o que é pesquisado;
@@ -265,7 +280,7 @@ Todos os documentos estão em `data/processed/documents.json`. Cada um tem:
 |---|---|
 | `title` | 2021 Abu Dhabi Grand Prix |
 | `season`, `round`, `date` | 2021, 22, 2021-12-12 |
-| `circuit`, `locality`, `country` | Yas Marina Circuit, Abu Dhabi, UAE |
+| `circuit`, `circuit_id`, `locality`, `country` | Yas Marina Circuit, circuit_yas_marina, Abu Dhabi, UAE |
 | `winner`, `winning_team` | [Max Verstappen], [Red Bull] |
 | `pole_position`, `podium`, `fastest_lap` | [Max Verstappen], [Verstappen, Hamilton, Sainz], [Max Verstappen] |
 | `starters`, `finishers` | 19, 14 |
@@ -299,22 +314,36 @@ Todos os documentos estão em `data/processed/documents.json`. Cada um tem:
 | `drivers`, `driver_ids`, `race_ids` | ligações |
 | **texto** | `summary`, `history` |
 
+### circuit — id `circuit_<referência>`
+
+| Campo | Exemplo (`circuit_monza`) |
+|---|---|
+| `title`, `locality`, `country` | Autodromo Nazionale di Monza, Monza, Italy |
+| `latitude`, `longitude`, `altitude` | 45.6156, 9.28111, 162 |
+| `first_season`, `last_season`, `seasons` | 1950, 2026, [1950 … 2026] |
+| `race_entries`, `grands_prix` | 76, [Italian Grand Prix] |
+| `most_wins` | [Michael Schumacher: 5, Lewis Hamilton: 5, Juan Fangio: 3, …] |
+| `race_ids` | ligações |
+| **texto** | `summary`, `history`, `layout`, `events`, `other` |
+
 ---
 
 ## 7. Números da coleção
 
-| | Corridas | Pilotos | Equipas | Total |
-|---|---|---|---|---|
-| Registos na Jolpica | 1162 | 818 | 168 | 2148 |
-| **Aceites** | **1116** | **719** | **147** | **1982** |
-| Rejeitados | 46 | 99 | 21 | 166 |
-| Palavras por documento (mediana) | 827 | 690 | 1082 | |
-| Palavras por documento (média) | 1252 | 1421 | 1921 | |
+| | Corridas | Pilotos | Equipas | Circuitos | Total |
+|---|---|---|---|---|---|
+| Registos na Jolpica | 1162 | 818 | 168 | 77 | 2225 |
+| **Aceites** | **1116** | **719** | **147** | **76** | **2058** |
+| Rejeitados | 46 | 99 | 21 | 1 | 167 |
+| Palavras por documento (mediana) | 827 | 690 | 1082 | 1238 | |
+| Palavras por documento (média) | 1252 | 1428 | 1921 | 1918 | |
 
-- Total de tokens: **2 649 343** · Vocabulário: **32 502** termos
+- Total de tokens: **2 788 503** · Vocabulário: **34 348** termos
 - Épocas cobertas: **1950 – 2026**
 - Cobertura dos campos das corridas: `summary` 100%, `race` 85%, `qualifying` 42%,
   `background` 38%, `post_race` 27%
+- Cobertura dos campos dos circuitos: `summary` 100%, `history` 83%, `events` 83%,
+  `layout` 54%
 - Todos os valores estão em `data/analysis/stats.json`.
 
 ---
@@ -326,8 +355,9 @@ Material para a secção de *data quality* do relatório (também em `stats.json
 | Problema | Quantos | Como foi tratado |
 |---|---|---|
 | Links da Jolpica que levam a **páginas de desambiguação** | 28 (21 pilotos, 7 equipas) | resolvidos automaticamente (passo 3) |
+| Link da Jolpica para o **artigo errado** (Long Beach → a cidade) | 1 circuito | corrigido à mão (passo 2) |
 | Links para **artigos que não existem** | 3 (2026 Barcelona‑Catalunya, equipas Hall e Turner) | rejeitados (`missing_article`) |
-| Documentos com **pouco texto** (< 100 palavras) | 163 | rejeitados (`too_short`) |
+| Documentos com **pouco texto** (< 100 palavras) | 164 | rejeitados (`too_short`); inclui o circuito de Pedralbes, por isso as suas 2 corridas ficam com `circuit_id` vazio |
 | Várias equipas Jolpica para o **mesmo artigo** (chassis‑motor) | 40 linhas | agrupadas numa só equipa |
 | Campo `status` da Jolpica **numérico e sem documentação** | — | significado deduzido da coluna `detail` (tabela abaixo) |
 | Entidade HTML no nome (`Lotus-Pratt &amp; Whitney`) | 1 | descodificada |
@@ -351,8 +381,8 @@ Significado deduzido do `status`:
 
 | Decisão | Porquê |
 |---|---|
-| Documento = **um artigo da Wikipedia** (corrida, piloto ou equipa) | unidade natural para as necessidades de informação; liga-se facilmente aos dados estruturados |
-| **Três tipos** de documento | chegar a ~2000 documentos e ter um modelo conceptual mais rico |
+| Documento = **um artigo da Wikipedia** (corrida, piloto, equipa ou circuito) | unidade natural para as necessidades de informação; liga-se facilmente aos dados estruturados |
+| **Quatro tipos** de documento | chegar a ~2000 documentos e ter um modelo conceptual mais rico; os circuitos respondem a perguntas sobre locais (traçado, história, acidentes) |
 | Texto partido em **campos fixos** por tipo | no M2 dá para pesar campos de forma diferente no Solr (ex.: `race^3 summary^1`) |
 | Mínimo de **100 palavras** | abaixo disso o artigo é só uma frase ou tabelas; com 150 perdiam-se 111 documentos a mais |
 | **Wikitext** em vez de texto já extraído | a API de texto só aceita 1 artigo por pedido, e com o limite de pedidos seriam horas |

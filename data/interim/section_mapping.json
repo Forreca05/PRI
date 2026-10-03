@@ -156,6 +156,18 @@
     "count": 82
   },
   {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "References",
+    "count": 74
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "External links",
+    "count": 74
+  },
+  {
     "type": "race",
     "field": "dropped",
     "section": "Further reading",
@@ -166,6 +178,12 @@
     "field": "biography",
     "section": "Formula One",
     "count": 72
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Lap records",
+    "count": 63
   },
   {
     "type": "driver",
@@ -192,9 +210,21 @@
     "count": 51
   },
   {
+    "type": "circuit",
+    "field": "history",
+    "section": "History",
+    "count": 51
+  },
+  {
     "type": "driver",
     "field": "dropped",
     "section": "Karting record",
+    "count": 50
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Events",
     "count": 50
   },
   {
@@ -258,6 +288,12 @@
     "count": 37
   },
   {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Notes",
+    "count": 37
+  },
+  {
     "type": "driver",
     "field": "dropped",
     "section": "Sources",
@@ -285,6 +321,12 @@
     "type": "team",
     "field": "dropped",
     "section": "Complete Formula One World Championship results",
+    "count": 34
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "See also",
     "count": 34
   },
   {
@@ -406,6 +448,12 @@
     "field": "dropped",
     "section": "Shared drives",
     "count": 19
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Layout history",
+    "count": 18
   },
   {
     "type": "race",
@@ -648,6 +696,18 @@
     "count": 7
   },
   {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Circuit",
+    "count": 7
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Layout",
+    "count": 7
+  },
+  {
     "type": "race",
     "field": "other",
     "section": "Additional information",
@@ -735,6 +795,12 @@
     "type": "team",
     "field": "dropped",
     "section": "Footnotes",
+    "count": 6
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Fatalities",
     "count": 6
   },
   {
@@ -870,6 +936,18 @@
     "count": 5
   },
   {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Records",
+    "count": 5
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Fatal accidents",
+    "count": 5
+  },
+  {
     "type": "race",
     "field": "dropped",
     "section": "Race notes",
@@ -981,6 +1059,48 @@
     "type": "team",
     "field": "history",
     "section": "Sponsorship",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Weather and climate",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Circuit history",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "The circuit",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Description",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Gallery",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Layout configurations",
+    "count": 4
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "A lap in a Formula One car",
     "count": 4
   },
   {
@@ -1203,6 +1323,30 @@
     "type": "team",
     "field": "dropped",
     "section": "Racing results",
+    "count": 3
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Characteristics",
+    "count": 3
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "In popular culture",
+    "count": 3
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Race lap records",
+    "count": 3
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Winners",
     "count": 3
   },
   {
@@ -1671,6 +1815,102 @@
     "type": "team",
     "field": "history",
     "section": "Formula Two",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Further reading",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Deaths from crashes",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Other events",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Climate",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Concerts",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Bibliography",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Track history",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Deaths",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Former series and major race winners",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Music events",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Formula One",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Motorsport events",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Racing history",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Design",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Construction",
+    "count": 2
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Reception",
     "count": 2
   },
   {
@@ -6492,6 +6732,672 @@
     "count": 1
   },
   {
+    "type": "circuit",
+    "field": "events",
+    "section": "Other competitions",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Evolution of the circuit",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "In other sports",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Criticism",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Layout history and lap records",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Weather",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Other racing events",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Brickyard Crossing Golf Course",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Headquarters",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Race winners",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Oval dimensions",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "1955 ban",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Motorcycle racing",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Bern Grand Prix",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Traces",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Track configurations",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Problems and renovations",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Other racing series",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Tour de France",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Reims-Gueux Circuits by years",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Racing series at Reims-Gueux",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "A lap of the circuit in a Formula One car",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Previous track configurations",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Racing",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Public access",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Commercial aspects",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Competitions",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Cycling and running competitions",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Names",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Circuits",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Recent years",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Lap times",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Track configuration",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Sebring in pop culture",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Events and uses",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Layouts",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Course layout",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "The Grand Prix circuit",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Oval track",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Renamed turns",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "The baseball stadium",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "AirPower air show",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Zeltweg Military Aviation Museum",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Motorsports",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Modernization",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "South African Grand Prix",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Track modifications",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Speed record",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Bugatti Circuit",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Driver Development Centre",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Mosport Speedway",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Major series",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Photo gallery",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Drag racing (NitrolympX – Rico Anthes Quarter Mile)",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "DTM",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Rallycross",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Track",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Track layout",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Noise limits",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Layout modifications",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Airfield",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Corners",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "In media",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "The original circuit",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Final years",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Formula One at Montréal",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Circuit layout",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Other circuit activities",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "1994 San Marino Grand Prix",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Recent developments",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Non-motorsport events",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Cultural district",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Midway and other structures",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Annual events",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Other notable events",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Transportation",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Education",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Other sources",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Major event winners",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Supercars",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "MotoGP",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Sprint Circuit",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Other information",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Drivers",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Fans",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Introduction",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "130R corner",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "In video games",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Background",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Cancellation",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Legacy",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Financial problems",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Noise pollution",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Motorsport at Donington",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Location",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Media",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Incidents",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Everyday access",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Track layouts",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Formula One Grand Prix",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Series hosted",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Major motorsport events",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Construction issues",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Branding",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Awards and recognition",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "layout",
+    "section": "Facilities",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "history",
+    "section": "Development",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Winners of the Mugello Grand Prix",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "events",
+    "section": "Multiple winners",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "After COVID-19 pandemic",
+    "count": 1
+  },
+  {
+    "type": "circuit",
+    "field": "other",
+    "section": "Craig Jones memorial",
+    "count": 1
+  },
+  {
     "type": "race",
     "field": "dropped",
     "section": "World Drivers' Championship standings after the race",
@@ -6765,6 +7671,12 @@
     "type": "team",
     "field": "dropped",
     "section": "Talbot Lago Record T26",
+    "count": 0
+  },
+  {
+    "type": "circuit",
+    "field": "dropped",
+    "section": "Formula One attendance records",
     "count": 0
   }
 ]

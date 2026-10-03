@@ -14,7 +14,9 @@ ANALYSIS = os.path.join(DATA, 'analysis')
 RACES_STRUCTURED_PATH = os.path.join(INTERIM, 'races_structured.json')
 DRIVERS_STRUCTURED_PATH = os.path.join(INTERIM, 'drivers_structured.json')
 TEAMS_STRUCTURED_PATH = os.path.join(INTERIM, 'teams_structured.json')
+CIRCUITS_STRUCTURED_PATH = os.path.join(INTERIM, 'circuits_structured.json')
 DOCUMENTS_PATH = os.path.join(PROCESSED, 'documents.json')
+DOCUMENTS_CSV_PATH = os.path.join(PROCESSED, 'documents.csv')
 REJECTED_PATH = os.path.join(INTERIM, 'rejected_documents.json')
 
 # Documents whose Wikipedia text has fewer words than this are discarded
