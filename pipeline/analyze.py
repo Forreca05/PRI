@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer
 
 from build_documents import TEXT_FIELDS
 from utils import (ANALYSIS, CIRCUITS_STRUCTURED_PATH, DOCUMENTS_PATH, DRIVERS_STRUCTURED_PATH,
@@ -124,6 +124,40 @@ def plot_top_terms(frequencies: dict):
     save('top_terms.png')
 
 
+def race_keywords_by_decade(docs: list, n: int = 6) -> dict:
+    """Top TF-IDF terms of the race reports of each decade, without names of drivers, teams and circuits."""
+    names = set()
+    for doc in docs:
+        if doc['type'] != 'race':
+            for name in [doc['title']] + (doc.get('names') or []):
+                names.update(re.findall(r'[a-z]+', name.lower()))
+    races = [d for d in docs if d['type'] == 'race']
+    vectorizer = TfidfVectorizer(stop_words=list(ENGLISH_STOP_WORDS | names), token_pattern=r'(?u)\b[a-z]{3,}\b',
+                                 min_df=5, max_df=0.5, sublinear_tf=True)
+    matrix = vectorizer.fit_transform([full_text(d) for d in races])
+    terms = vectorizer.get_feature_names_out()
+    decades = np.array([d['season'] // 10 * 10 for d in races])
+    keywords = {}
+    for decade in sorted(set(decades)):
+        mean = np.asarray(matrix[decades == decade].mean(axis=0)).ravel()
+        keywords[f'{decade}s'] = [str(terms[i]) for i in mean.argsort()[::-1][:n]]
+    return keywords
+
+
+def plot_driver_words_vs_entries(docs: list) -> float:
+    drivers = pd.DataFrame([{'entries': d['race_entries'], 'words': d['word_count']}
+                            for d in docs if d['type'] == 'driver' and d.get('race_entries')])
+    plt.figure(figsize=(5, 4))
+    plt.scatter(drivers['entries'], drivers['words'], s=6, alpha=0.5, color=COLORS['driver'])
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel('race entries (log scale)')
+    plt.ylabel('words in the article (log scale)')
+    plt.title('Driver article length vs career length')
+    save('driver_words_vs_entries.png')
+    return round(float(drivers['entries'].corr(drivers['words'], method='spearman')), 2)
+
+
 def plot_bar(counter: Counter, title: str, name: str, color: str, n: int = 15):
     labels, values = zip(*counter.most_common(n))
     plt.figure(figsize=(7, 4))
@@ -200,6 +234,9 @@ def analyze():
     plot_bar(retirement_reasons, 'Most common retirement reasons', 'retirement_reasons.png', COLORS['race'])
     plot_bar(nationalities, 'Driver nationalities', 'driver_nationalities.png', COLORS['driver'])
     plot_bar(countries, 'Races per country', 'race_countries.png', COLORS['race'])
+
+    stats['race_keywords_by_decade'] = race_keywords_by_decade(docs)
+    stats['driver_entries_words_spearman'] = plot_driver_words_vs_entries(docs)
 
     write_json(os.path.join(ANALYSIS, 'stats.json'), stats)
     print(f'{len(docs)} documents, {total_tokens} tokens, vocabulary {len(all_terms)} -> {ANALYSIS}')

@@ -238,6 +238,9 @@ Gera `analysis/stats.json` e os gráficos:
 | `retirement_reasons.png` | motivos de abandono mais comuns |
 | `driver_nationalities.png` | nacionalidades dos pilotos |
 | `race_countries.png` | corridas por país |
+| `driver_words_vs_entries.png` | tamanho do artigo vs. nº de corridas de cada piloto (Spearman em `stats.json`) |
+
+O `stats.json` inclui também as palavras-chave TF-IDF dos relatos de corrida por década (`race_keywords_by_decade`), sem nomes de pilotos, equipas e circuitos.
 
 ---
 
@@ -362,7 +365,7 @@ Material para a secção de *data quality* do relatório (também em `stats.json
 | Campo `status` da Jolpica **numérico e sem documentação** | — | significado deduzido da coluna `detail` (tabela abaixo) |
 | Entidade HTML no nome (`Lotus-Pratt &amp; Whitney`) | 1 | descodificada |
 | **Limite de pedidos** da Wikipedia (HTTP 429) | — | pedidos em lotes + respeitar `Retry-After` |
-| Quantidade de texto **muito desigual por época** | — | ver `race_words_by_decade.png`: corridas dos anos 2000 têm ~4× mais texto que as dos anos 60 |
+| Quantidade de texto **muito desigual por época** | — | ver `race_words_by_decade.png`: corridas dos anos 2000 têm ~6× mais texto que as dos anos 60 |
 
 Significado deduzido do `status`:
 

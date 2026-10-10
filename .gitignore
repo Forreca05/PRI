@@ -1,3 +1,17 @@
 .venv/
 __pycache__/
 data/raw/
+
+# Personal notes and reference material (not part of the project)
+notes.txt
+report/example.tex
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls

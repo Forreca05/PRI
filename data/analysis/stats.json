@@ -849,5 +849,72 @@
       "Netherlands",
       27
     ]
-  ]
+  ],
+  "race_keywords_by_decade": {
+    "1950s": [
+      "manuel",
+      "british",
+      "entered",
+      "privateer",
+      "argentine",
+      "french"
+    ],
+    "1960s": [
+      "manufacturers",
+      "cup",
+      "british",
+      "works",
+      "entered",
+      "champion"
+    ],
+    "1970s": [
+      "cup",
+      "manufacturers",
+      "austrian",
+      "south",
+      "swedish",
+      "champion"
+    ],
+    "1980s": [
+      "tag",
+      "turbo",
+      "brazilian",
+      "frenchman",
+      "italian",
+      "french"
+    ],
+    "1990s": [
+      "pre",
+      "report",
+      "failed",
+      "spun",
+      "failure",
+      "german"
+    ],
+    "2000s": [
+      "friday",
+      "constructors",
+      "stops",
+      "sessions",
+      "saturday",
+      "corner"
+    ],
+    "2010s": [
+      "turn",
+      "penalty",
+      "tyre",
+      "compound",
+      "safety",
+      "soft"
+    ],
+    "2020s": [
+      "utc",
+      "local",
+      "tyre",
+      "event",
+      "topped",
+      "medium"
+    ]
+  },
+  "driver_entries_words_spearman": 0.69
 }
