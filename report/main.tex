@@ -1,9 +1,14 @@
 \documentclass[sigconf]{acmart}
 \usepackage{float}
+\usepackage{multicol}
+\captionsetup[table]{position=bottom}
 
 \setcopyright{none}
 \acmConference[G67]{PRI}{October 2026}{Porto, Portugal}
 \renewcommand\footnotetextcopyrightpermission[1]{}
+\acmYear{2026}
+\acmDOI{}
+\acmISBN{}
 
 \begin{document}
 
@@ -41,12 +46,7 @@
 
 \renewcommand{\abstractname}{ABSTRACT}
 \begin{abstract}
-  Information about Formula One is spread across numerous sources, so fans who want to explore the history of the sport have to combine several of them. This project addresses this need by building a search system that brings Formula One data together in a single place.
-
-  We combine structured data from the Jolpica F1 database, which provides race results and championship
-  records, with text from English Wikipedia articles, linking each record to its article covering the 1950 to 2026 seasons.
-
-  The resulting collection has 2058 documents of four types (races, drivers, teams and circuits), with about 2.8 million words, produced by a reproducible pipeline that collects, cleans and links both sources.
+  Formula One history is scattered across many sources. We build a search system that unifies it, combining race results and championship records from Jolpica F1 with English Wikipedia text, linked through Jolpica's article URLs. A reproducible pipeline collects, cleans and links the sources into 2058 documents (races, drivers, teams and circuits) from 1950 to 2026, totalling 2.8 million words.
 \end{abstract}
 
 
@@ -80,7 +80,7 @@
 
 
 % =====================================================================
-\section{Introduction}
+\section{INTRODUCTION}
 This work was developed for the course ``Information Processing and
 Retrieval'' (PRI) of the Master's in Informatics and Computing Engineering
 (M.EIC) at the Faculty of Engineering of the University of Porto (FEUP).
@@ -88,104 +88,97 @@ Retrieval'' (PRI) of the Master's in Informatics and Computing Engineering
 The choice of Formula One is motivated both by personal interest and by the
 nature of its data. Most of us follow the sport, but as relatively recent
 fans we wanted an easy way to learn about its history, which goes back to
-the first World Championship race in 1950. This history comes in two forms:
+the first World Championship race in 1950. Information about its history comes in two forms:
 structured data, such as results and championship standings, and free text,
-such as race reports and driver biographies. Many questions need both. For
+such as race reports and driver biographies. Gaining deeper insight into a given topic often requires integrating both types of information, as they provide complementary perspectives. For
 example, finding races decided by a late mechanical failure requires
 matching the retirement reason in the results with the narrative of the
 race, which makes Formula One a good domain for an information retrieval
 system close to a real-world scenario.
 
-This report covers Milestone 1, whose goal is to build the document
-collection. Section~\ref{sec:dataset} describes the dataset, from its
-sources and preparation to its quality, structure and characterization.
+This report covers Milestone 1, which aims to build the document
+collection. Section~\ref{sec:dataset} describes the dataset, including its sources, preparation, quality, structure, and characterization.
 Section~\ref{sec:needs} presents the search scenarios, and
 Section~\ref{sec:conclusions} concludes and outlines the next milestone.
 
 % =====================================================================
-\section{Dataset}
+\section{DATASET}
 \label{sec:dataset}
 
 \subsection{Data Origin and Description}
 \label{sec:sources}
-Two complementary sources were selected, as they cover the full history of
-the sport: the Jolpica F1 database and the English Wikipedia.
-Table~\ref{tab:sources} characterizes both as downloaded. For Jolpica,
-rows and columns are summed over its 11 tables; for Wikipedia, each row is
-an article and the columns are the fields stored for it.
+Two complementary sources were selected, which, when combined, cover the full history of
+the sport: the Jolpica F1 database and English Wikipedia.
 
-\begin{table}[h]
+Table~\ref{tab:sources} characterizes both sources in their raw form. For Jolpica, rows and columns are summed over its 11 tables; for Wikipedia, each row corresponds to
+an article, and each column to a field stored for it.
+
+\begin{table}[ht]
   \small
-  \caption{Initial data sources characterization~\cite{jolpica,wikipedia}}
-  \label{tab:sources}
   \begin{tabular}{llrrrr}
     \toprule
     Source & Format & Files & Rows & Columns & Size (MB) \\
     \midrule
     Jolpica F1 & CSV & 11 & 141029 & 110 & 7.30 \\
-    Wikipedia (EN) & JSON & 2225 & 2225 & 7 & 77.37 \\
+    Wikipedia & JSON & 2225 & 2225 & 7 & 77.37 \\
     \bottomrule
   \end{tabular}
+  \caption{Initial data sources characterization~\cite{jolpica,wikipedia}}
+  \label{tab:sources}
 \end{table}
 
 Jolpica F1~\cite{jolpica} is an open-source project that succeeds the Ergast
-API, discontinued at the end of 2024. Its relational database holds the
-results of every World Championship race since 1950, including starting
-grids, finishing positions, retirement reasons, team line-ups and
+API, which was discontinued at the end of 2024. Its relational database holds the
+results of every World Championship race since the inaugural 1950 season, together with additional information such as starting
+grids, finishing positions, retirement reasons, team line-ups, and
 championship standings. We used its CSV dump instead of the REST API, which
 would require around 260 paginated requests under an hourly rate limit.
 Wikipedia~\cite{wikipedia} provides the text: the narrative of each race,
 the biography of each driver and the history of each team and circuit. The
 articles were obtained in wikitext through the MediaWiki Action
-API~\cite{mediawikiapi}, which returns several articles per request.
+API~\cite{mediawikiapi}, returning several articles per request.
 
-The two sources are linked by Jolpica itself, which stores the Wikipedia
-URL of every race, driver, team and circuit. This avoids matching by name,
+The two sources are linked directly through Jolpica, which stores the Wikipedia
+URL of each race, driver, team and circuit. This avoids matching by name,
 which would be error-prone for drivers with the same name or races whose
-title changed over the years. Both sources have public licenses (CC
-BY-NC-SA 4.0 for Jolpica and CC BY-SA 4.0 for Wikipedia) that allow their
-use in an academic project.
+title changed over the years. Both sources are released under open licenses (CC
+BY-NC-SA 4.0 for Jolpica and CC BY-SA 4.0 for Wikipedia) that permit their use in an academic project.
 
 \subsection{Data Preparation}
 \label{sec:pipeline}
-The pipeline (Figure~\ref{fig:pipeline}) is implemented in Python as five
+The pipeline (Figure~\ref{fig:pipeline}) transforms the two raw sources into
+a validated collection of documents. It is implemented in Python as five
 scripts, each reading the output of the previous one. Raw downloads,
 intermediate files and the final collection are kept in separate folders.
 
-The first script downloads the Jolpica dump, keeps the 11 tables needed
+\textit{Data Ingestion} downloads the Jolpica dump, keeps the 11 tables needed
 and records the version used (12 September 2026), since the dump link
-always points to the latest one. The second script then joins these tables
+always points to the latest one. \textit{Entity Structuring} then joins these tables
 with Pandas~\cite{pandas} into one record per race, driver, team and
 circuit, with values such as the winner and retirements of a race or the
 career totals of a driver. Jolpica has one team row per chassis--engine
 combination (``Cooper-Climax'', ``Cooper-Maserati''), so rows that point to
 the same article were merged into one team, and only races already held
-were kept. The totals were checked against known facts, such as Ayrton
-Senna's 41 wins.
+were kept.
 
-Each of these records carries the link to its Wikipedia article, which the
-third script uses to download the text. Since Wikipedia blocks anonymous
+Each record carries the link to its Wikipedia article, which the
+\textit{Wikipedia Crawler} uses to download the text through the MediaWiki API. Since Wikipedia blocks anonymous
 clients that send one request per page (HTTP 429), articles are requested
 in batches of 20, reducing about 2230 requests to 115. Each article is
 cached locally with its page and revision identifiers, which identify the
 exact version used and allow later runs to download only what is missing.
 
-The fourth script builds the documents. It first converts the wikitext to
-clean text with mwparserfromhell~\cite{mwparserfromhell}: tables,
-references, infoboxes, images and categories are removed, links are
-replaced by their visible text, and templates that are part of a sentence,
-such as unit conversions, keep their text. Each article is then split by
+The \textit{Wikitext Parser} converts the wikitext to clean text with mwparserfromhell~\cite{mwparserfromhell}, removing tables,
+references, infoboxes and images and keeping the visible text of links.
+In \textit{Schema Mapping \& Filtering}, each article is split by
 its sections, which are mapped by keywords to a fixed set of text fields
-per document type (Table~\ref{tab:fields}). For example, a race section
-called ``Race report'' goes to the \texttt{race} field, while sections
-without prose, such as the classification tables or the championship
-standings, are discarded. Having fixed fields will allow each part of a
-document to be weighted differently in the next milestone. Documents with
-less than 100 words of text are rejected, with the reason recorded. The
-accepted ones are linked to each other in both directions (races, drivers
+per document type (Table~\ref{tab:fields}), and sections without prose,
+such as classification tables, are discarded. Documents with
+fewer than 100 words of text are rejected, with the reason recorded. The
+\textit{Relational Linker} links the accepted ones to each other in both directions (races, drivers
 and teams, and races and circuits), keeping only links between documents
-that exist in the collection, and exported in JSON and CSV. The fifth
-script computes the statistics and plots of
+that exist in the collection, and exports them in JSON and CSV. Finally,
+\textit{Collection Characterization} computes the statistics and plots of
 Section~\ref{sec:characterization}, using Matplotlib~\cite{matplotlib},
 NumPy~\cite{numpy} and scikit-learn~\cite{scikitlearn}.
 
@@ -196,7 +189,7 @@ in order. Each step also has its own target (\texttt{collect},
 \texttt{analyze}), while \texttt{make clean} removes the generated files
 but keeps the downloads, and \texttt{make clean-all} removes everything.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\linewidth]{imgs/pipeline.png}
   \caption{Data preparation pipeline}
@@ -214,11 +207,9 @@ Table~\ref{tab:quality} lists the problems found and how they were handled.
 Most come from the links between the sources. In 28 cases, the Jolpica link
 leads to a \textbf{disambiguation page} (``Tony Brooks may refer
 to\ldots''), usually because a more famous person has the same name.
-Fixing these by hand would not survive a new run of the pipeline, so they
-are resolved automatically: the script prefers the entry whose title
-mentions ``Formula One'' or ``racing driver'', then one on a line that
-mentions Formula One, and finally one on a line that mentions racing. For
-example, ``Tony Brooks'' becomes ``Tony Brooks (racing driver)'', and each
+So that the fix survives a new run of the pipeline, they are resolved
+automatically by choosing the entry that mentions ``Formula One'' or
+``racing driver'' (e.g., ``Tony Brooks (racing driver)''), and each
 correction is recorded with the original link. The Long Beach circuit links
 to the article about the city, which is a valid article and cannot be
 detected automatically, so it was corrected by hand.
@@ -237,10 +228,8 @@ documents would be lost, many of them with useful text. One side effect is
 that the Pedralbes circuit was rejected, so its two races have no linked
 circuit document.
 
-\begin{table}[h]
+\begin{table}[ht]
   \small
-  \caption{Data quality issues and how they were handled}
-  \label{tab:quality}
   \begin{tabular}{p{3.6cm}rp{2.8cm}}
     \toprule
     Issue & Count & Handling \\
@@ -254,21 +243,21 @@ circuit document.
     HTML entities in names & 1 & decoded \\
     \bottomrule
   \end{tabular}
+  \caption{Data quality issues and how they were handled}
+  \label{tab:quality}
 \end{table}
 
 \subsection{Final Dataset}
 \label{sec:final}
-The final collection has 2058 documents of four types
-(Table~\ref{tab:collection}). Each document combines structured fields from
-Jolpica, useful for filters, with text fields from Wikipedia, which are the
+The final collection comprises 2058 documents of four types and 59 distinct
+fields, stored in a 22.1~MB JSON file (Table~\ref{tab:collection}). Each document combines structured fields from
+Jolpica, used for filters, with text fields from Wikipedia, which are the
 ones searched (Table~\ref{tab:fields}). All documents also keep the article
-URL and revision and their word count. An abridged example of a race
+URL, the revision identifier and their word count. An abridged example of a race
 document is shown in Appendix~\ref{sec:example}.
 
-\begin{table}[h]
+\begin{table}[ht]
   \small
-  \caption{Final collection}
-  \label{tab:collection}
   \begin{tabular}{lrrrrr}
     \toprule
      & Races & Drivers & Teams & Circuits & Total \\
@@ -276,15 +265,16 @@ document is shown in Appendix~\ref{sec:example}.
     Jolpica records & 1162 & 818 & 168 & 77 & 2225 \\
     Accepted & 1116 & 719 & 147 & 76 & 2058 \\
     Rejected & 46 & 99 & 21 & 1 & 167 \\
+    Fields & 34 & 27 & 24 & 25 & 59 \\
     Median words & 827 & 690 & 1082 & 1238 & -- \\
     \bottomrule
   \end{tabular}
+  \caption{Final collection}
+  \label{tab:collection}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[ht]
   \small
-  \caption{Main fields of each document type}
-  \label{tab:fields}
   \begin{tabular}{p{1.1cm}p{4.0cm}p{2.3cm}}
     \toprule
     Type & Structured fields & Text fields \\
@@ -300,34 +290,34 @@ document is shown in Appendix~\ref{sec:example}.
     summary, history, layout, events \\
     \bottomrule
   \end{tabular}
+  \caption{Main fields of each document type}
+  \label{tab:fields}
 \end{table}
 
 \subsection{Conceptual Model}
 \label{sec:model}
 The conceptual model (Figure~\ref{fig:model}) describes the documents
 produced by the pipeline. An abstract \textbf{Document} holds the fields
-shared by all types: the identifier, title, word count, the Wikipedia
-identifiers and the \texttt{summary}. It is specialized into four classes,
+shared by all types (identifier, title, word count, Wikipedia
+identifiers and the \texttt{summary}). It is specialized into four classes,
 \textbf{RaceDocument}, \textbf{DriverDocument}, \textbf{TeamDocument} and
 \textbf{CircuitDocument}, each with its own structured attributes and text
 sections. Identifiers are canonical and readable, such as
-\texttt{race\_2021\_22} or \texttt{driver\_hamilton}, and the collection
-only accepts documents with at least 100 words.
+\texttt{race\_2021\_22} or \texttt{driver\_hamilton}, and only documents with at least 100 words are accepted into the collection.
 
-A driver takes part in one or more races, and each race has one or more
-drivers. A driver drives for one or more teams, and a team has at least one
-driver, not necessarily two: 47 Jolpica teams had a single driver in their
-whole history, mostly private entries of the 1950s. Each race has at least
-two teams, while a team may have no linked race, which happens for three
-teams whose races were all rejected. Finally, each race is held at exactly
-one circuit, which hosted one or more races; in the documents this link is
-optional, because the Pedralbes circuit was rejected and its two races have
-no circuit document. All relations are stored as lists of identifiers in
-both directions (e.g., \texttt{driver\_ids} in a race and \texttt{race\_ids}
-in a driver), so the search system can move from a document to the related
-ones.
+Each race has several drivers and at least two teams, and each driver
+participates in one or more races and drives for one or more teams. A team has
+at least one driver, not necessarily two: 47 Jolpica teams had a single driver
+in their whole history, mostly private entries of the 1950s. A team may have no
+linked race, which happens for three teams whose races were all rejected.
+Each race is held at exactly one circuit, which hosts one or more races; in the
+documents this link is optional, because the Pedralbes circuit was rejected
+and its two races have no circuit document. All relations are stored as lists
+of identifiers in both directions (e.g., \texttt{driver\_ids} in a race and
+\texttt{race\_ids} in a driver), allowing the search system to move from a
+document to the related ones.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\linewidth]{imgs/conceptual_model.png}
   \caption{Domain conceptual model}
@@ -356,20 +346,8 @@ fewer sources. This matters for the search system: a long document has more
 chances of matching a query, so a ranking that does not normalize length
 well will tend to favor recent races.
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{imgs/word_count_distribution.png}
-  \caption{Words per document, by document type (log scale)}
-  \Description{Four histograms, one per document type, with words per
-  document on a logarithmic axis from 100 to over 10000. Race documents peak
-  around 1000 words; driver documents are spread evenly between 100 and 3000
-  words; team and circuit documents are fewer and peak around 1000 words.}
-  \label{fig:wordcount}
-\end{figure*}
-
 The collection has 2.79 million tokens and a vocabulary of 34348 terms,
-37\% of which appear only once, mostly uncommon words and names of people
-and places mentioned in a single article. Stopwords make up 45\% of all
+37\% of which appear only once. Stopwords make up 45\% of all
 tokens. Term frequency follows Zipf's law~\cite{manning2008} between ranks
 10 and about 2000 (Figure~\ref{fig:zipf}), with the usual deviations at both
 ends: the most frequent words are less frequent than the law predicts, and
@@ -393,13 +371,10 @@ follow the history of the sport: privateer and works entries in the 1950s,
 turbo engines in the 1980s, refuelling stops and Friday sessions in the
 2000s, and tyre compounds, penalties and the safety car in the 2010s. Some
 noise remains, such as ``utc'', from the start times given in recent
-articles. These terms show which vocabulary a query must use to reach each
-period.
+articles.
 
-\begin{table}[h]
+\begin{table}[ht]
   \small
-  \caption{Top TF-IDF keywords of race documents by decade}
-  \label{tab:keywords}
   \begin{tabular}{lp{6.3cm}}
     \toprule
     Decade & Keywords \\
@@ -414,6 +389,8 @@ period.
     2020s & utc, local, tyre, event, topped \\
     \bottomrule
   \end{tabular}
+  \caption{Top TF-IDF keywords of race documents by decade}
+  \label{tab:keywords}
 \end{table}
 
 In the structured fields, engine failures
@@ -427,7 +404,7 @@ and 27\% the aftermath (Figure~\ref{fig:coverage}), so some queries can only
 be answered for part of the collection, mostly recent seasons.
 
 % =====================================================================
-\section{Search Scenarios}
+\section{SEARCH SCENARIOS}
 \label{sec:needs}
 Table~\ref{tab:needs} lists the information needs that will be used to
 evaluate the system. They were chosen so that they depend on the text and
@@ -436,14 +413,11 @@ expressed with varied vocabulary, and have answers in the collection, which
 we confirmed by finding relevant documents for each. For each need we
 defined what makes a document relevant and what does not. In N2, for
 example, a race is relevant only if it was affected by rain \textbf{and}
-had an unusual result, such as the 1975 Austrian Grand Prix, won by Vittorio
-Brambilla in a March, or the 1996 Monaco Grand Prix, where only three cars
-finished. A wet race won by the favorite is not relevant.
+had an unusual result, such as the 1996 Monaco Grand Prix, where only three
+cars finished. A wet race won by the favorite is not relevant.
 
-\begin{table}[h]
+\begin{table}[ht]
   \small
-  \caption{Information needs}
-  \label{tab:needs}
   \begin{tabular}{lp{5.4cm}l}
     \toprule
     ID & Information need & Type \\
@@ -460,6 +434,8 @@ finished. A wet race won by the favorite is not relevant.
     N10 & Technical innovations that were later banned & team \\
     \bottomrule
   \end{tabular}
+  \caption{Information needs}
+  \label{tab:needs}
 \end{table}
 
 Some needs are hard on purpose. In N1, the same idea appears as
@@ -473,21 +449,13 @@ show the limits of a search based only on words and are a good starting
 point for the comparison with semantic search in the third milestone.
 
 % =====================================================================
-\section{Conclusions and Future Work}
+\section{CONCLUSION AND FUTURE WORK}
 \label{sec:conclusions}
 In this milestone we built a collection of 2058 documents about the history
 of Formula One, combining Jolpica F1 results with Wikipedia text through a
 reproducible pipeline that runs with a single command and records the
 versions of the data it used. We also analyzed the collection and defined
 ten information needs.
-
-The hardest part was the text. Wikipedia limits anonymous requests, which
-forced us to download the articles in batches, and the wikitext needed a
-fair amount of cleaning, since it mixes prose with tables, templates and
-references. The disambiguation pages were also a problem we did not expect,
-since the links came from a source we trusted. The amount of text also
-varies a lot with the period, which will have to be considered when
-ranking.
 
 In the next milestone, the collection will be indexed in Apache
 Solr~\cite{solr}. As the text is already split into fields, we will compare
@@ -496,19 +464,21 @@ structured fields as filters, evaluating both with the information needs
 above through precision at $k$ and mean average precision.
 
 % =====================================================================
-\clearpage
+\onecolumn
+\raggedbottom
+\appendix
+\begin{multicols}{2}
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
 
-\onecolumn
-
-\appendix
-
+\columnbreak
+\setcounter{section}{0}
 \section{Example Document}
 \label{sec:example}
 Abridged race document (\texttt{race\_2021\_22}); long lists and texts are
 cut with ``\ldots''.
 
+{\footnotesize
 \begin{verbatim}
 {
  "id": "race_2021_22",
@@ -541,8 +511,24 @@ cut with ``\ldots''.
  "wikipedia_revid": 1373349274
 }
 \end{verbatim}
+}
+\end{multicols}
 
 \section{Additional Figures}
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{imgs/word_count_distribution.png}
+  \caption{Words per document, by document type (log scale)}
+  \Description{Four histograms, one per document type, with words per
+  document on a logarithmic axis from 100 to over 10000. Race documents peak
+  around 1000 words; driver documents are spread evenly between 100 and 3000
+  words; team and circuit documents are fewer and peak around 1000 words.}
+  \label{fig:wordcount}
+  \end{minipage}
+\end{figure}
 
 \begin{figure}[H]
   \centering
@@ -561,9 +547,10 @@ cut with ``\ldots''.
     \Description{Bar chart of the percentage of race documents with each text field: summary 100\%, race 85\%, qualifying 42\%, background 38\%, post-race 27\% and other 11\%.}
     \label{fig:coverage}
   \end{minipage}
+\end{figure}
 
-  \vspace{0.6cm}
-
+\begin{figure}[H]
+  \centering
   \begin{minipage}[t]{0.48\textwidth}
     \centering
     \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{imgs/retirement_reasons.png}
@@ -579,9 +566,10 @@ cut with ``\ldots''.
     \Description{Horizontal bar chart of driver nationalities. British (142) and American (131) are the largest groups, followed by Italian, French and German.}
     \label{fig:nationalities}
   \end{minipage}
+\end{figure}
 
-  \vspace{0.6cm}
-
+\begin{figure}[H]
+  \centering
   \begin{minipage}[t]{0.31\textwidth}
     \centering
     \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{imgs/zipf.png}
@@ -605,9 +593,10 @@ cut with ``\ldots''.
     \Description{Log-log scatter plot of words in each driver article against the number of race entries. Drivers with one to three entries range from 100 to about 2500 words, and length grows with the number of entries up to over 10000 words for drivers with more than 200 entries.}
     \label{fig:driverwords}
   \end{minipage}
+\end{figure}
 
-  \vspace{0.6cm}
-
+\begin{figure}[H]
+  \centering
   \begin{minipage}{\textwidth}
   \centering
   \includegraphics[width=\textwidth]{imgs/top_terms.png}
