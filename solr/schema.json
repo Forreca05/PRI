@@ -1,0 +1,110 @@
+{
+    "add-field-type": [
+        {
+            "name": "f1_text",
+            "class": "solr.TextField",
+            "positionIncrementGap": "100",
+            "indexAnalyzer": {
+                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
+                "filters": [
+                    {"class": "solr.EnglishPossessiveFilterFactory"},
+                    {"class": "solr.ASCIIFoldingFilterFactory", "preserveOriginal": true},
+                    {"class": "solr.LowerCaseFilterFactory"},
+                    {"class": "solr.StopFilterFactory", "words": "lang/stopwords_en.txt", "ignoreCase": true},
+                    {"class": "solr.PorterStemFilterFactory"}
+                ]
+            },
+            "queryAnalyzer": {
+                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
+                "filters": [
+                    {"class": "solr.EnglishPossessiveFilterFactory"},
+                    {"class": "solr.ASCIIFoldingFilterFactory", "preserveOriginal": true},
+                    {"class": "solr.LowerCaseFilterFactory"},
+                    {"class": "solr.StopFilterFactory", "words": "lang/stopwords_en.txt", "ignoreCase": true},
+                    {"class": "solr.PorterStemFilterFactory"}
+                ]
+            }
+        },
+        {
+            "name": "f1_name",
+            "class": "solr.TextField",
+            "positionIncrementGap": "100",
+            "analyzer": {
+                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
+                "filters": [
+                    {"class": "solr.ASCIIFoldingFilterFactory", "preserveOriginal": true},
+                    {"class": "solr.LowerCaseFilterFactory"}
+                ]
+            }
+        },
+        {
+            "name": "f1_date",
+            "class": "solr.DateRangeField"
+        }
+    ],
+    "add-field": [
+        {"name": "type",               "type": "string",  "indexed": true, "stored": true},
+        {"name": "title",              "type": "f1_name", "indexed": true, "stored": true},
+
+        {"name": "summary",            "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "background",         "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "qualifying",         "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "race",               "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "post_race",          "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "other",              "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "biography",          "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "history",            "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "layout",             "type": "f1_text", "indexed": true, "stored": true},
+        {"name": "events",             "type": "f1_text", "indexed": true, "stored": true},
+
+        {"name": "circuit",            "type": "f1_name", "indexed": true, "stored": true},
+        {"name": "locality",           "type": "f1_name", "indexed": true, "stored": true},
+        {"name": "winner",             "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "winning_team",       "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "pole_position",      "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "podium",             "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "fastest_lap",        "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "drivers",            "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "teams",              "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "names",              "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "grands_prix",        "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "retirements",        "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+        {"name": "most_wins",          "type": "f1_name", "indexed": true, "stored": true, "multiValued": true},
+
+        {"name": "country",            "type": "string",  "indexed": true, "stored": true},
+        {"name": "nationality",        "type": "string",  "indexed": true, "stored": true},
+        {"name": "code",               "type": "string",  "indexed": true, "stored": true},
+        {"name": "retirement_reasons", "type": "string",  "indexed": true, "stored": true, "multiValued": true},
+        {"name": "circuit_id",         "type": "string",  "indexed": true, "stored": true},
+        {"name": "driver_ids",         "type": "string",  "indexed": true, "stored": true, "multiValued": true},
+        {"name": "team_ids",           "type": "string",  "indexed": true, "stored": true, "multiValued": true},
+        {"name": "race_ids",           "type": "string",  "indexed": true, "stored": true, "multiValued": true},
+        {"name": "wikipedia_url",      "type": "string",  "indexed": false, "stored": true},
+        {"name": "wikipedia_title",    "type": "string",  "indexed": true, "stored": true},
+
+        {"name": "season",             "type": "pint",    "indexed": true, "stored": true},
+        {"name": "round",              "type": "pint",    "indexed": true, "stored": true},
+        {"name": "starters",           "type": "pint",    "indexed": true, "stored": true},
+        {"name": "finishers",          "type": "pint",    "indexed": true, "stored": true},
+        {"name": "word_count",         "type": "pint",    "indexed": true, "stored": true},
+        {"name": "permanent_number",   "type": "pint",    "indexed": true, "stored": true},
+        {"name": "first_season",       "type": "pint",    "indexed": true, "stored": true},
+        {"name": "last_season",        "type": "pint",    "indexed": true, "stored": true},
+        {"name": "seasons",            "type": "pint",    "indexed": true, "stored": true, "multiValued": true},
+        {"name": "race_entries",       "type": "pint",    "indexed": true, "stored": true},
+        {"name": "race_starts",        "type": "pint",    "indexed": true, "stored": true},
+        {"name": "wins",               "type": "pint",    "indexed": true, "stored": true},
+        {"name": "podiums",            "type": "pint",    "indexed": true, "stored": true},
+        {"name": "pole_positions",     "type": "pint",    "indexed": true, "stored": true},
+        {"name": "championships",      "type": "pint",    "indexed": true, "stored": true},
+        {"name": "championship_years", "type": "pint",    "indexed": true, "stored": true, "multiValued": true},
+        {"name": "altitude",           "type": "pint",    "indexed": true, "stored": true},
+        {"name": "latitude",           "type": "pdouble", "indexed": true, "stored": true},
+        {"name": "longitude",          "type": "pdouble", "indexed": true, "stored": true},
+        {"name": "wikipedia_pageid",   "type": "plong",   "indexed": true, "stored": true},
+        {"name": "wikipedia_revid",    "type": "plong",   "indexed": true, "stored": true},
+
+        {"name": "date",               "type": "f1_date", "indexed": true, "stored": true},
+        {"name": "date_of_birth",      "type": "f1_date", "indexed": true, "stored": true}
+    ]
+}

@@ -96,10 +96,9 @@ matching the retirement reason in the results with the narrative of the
 race, which makes Formula One a good domain for an information retrieval
 system close to a real-world scenario.
 
-This report covers Milestone 1, which aims to build the document
-collection. Section~\ref{sec:dataset} describes the dataset, including its sources, preparation, quality, structure, and characterization.
+Section~\ref{sec:dataset} describes the dataset, including its sources, preparation, quality, structure, and characterization.
 Section~\ref{sec:needs} presents the search scenarios, and
-Section~\ref{sec:conclusions} concludes and outlines the next milestone.
+Section~\ref{sec:conclusions} concludes and outlines future work.
 
 % =====================================================================
 \section{DATASET}
@@ -223,10 +222,8 @@ the retirement reasons, one of the most useful structured fields.
 
 Most of the 164 \textbf{short documents} are drivers from the 1950s with one
 or two races, whose article is a single sentence followed by a table. The
-threshold was chosen by looking at these articles: with 150 words, 111 more
-documents would be lost, many of them with useful text. One side effect is
-that the Pedralbes circuit was rejected, so its two races have no linked
-circuit document.
+threshold was chosen by inspecting these articles: raising it to 150 words
+would reject 111 more documents, many of them with useful text.
 
 \begin{table}[ht]
   \small
@@ -269,7 +266,7 @@ document is shown in Appendix~\ref{sec:example}.
     Median words & 827 & 690 & 1082 & 1238 & -- \\
     \bottomrule
   \end{tabular}
-  \caption{Final collection}
+  \caption{Final collection. The total of fields counts distinct fields, since 9 are shared by all types}
   \label{tab:collection}
 \end{table}
 
@@ -406,7 +403,7 @@ be answered for part of the collection, mostly recent seasons.
 % =====================================================================
 \section{SEARCH SCENARIOS}
 \label{sec:needs}
-Table~\ref{tab:needs} lists the information needs that will be used to
+Table~\ref{tab:needs} lists the information needs used to
 evaluate the system. They were chosen so that they depend on the text and
 not only on the structured fields, cover three document types, can be
 expressed with varied vocabulary, and have answers in the collection, which
@@ -444,24 +441,26 @@ stop''; in N4, the text often gives only the two names, so the
 \texttt{teams} field is needed; N7 has few documents that use the words of
 the query, even though there are well-known cases such as Niki Lauda or
 Felipe Massa; and in N10, ``banned'' mostly returns the ban on turbo
-engines, which affected every team and is not relevant. These cases will
-show the limits of a search based only on words and are a good starting
-point for the comparison with semantic search in the third milestone.
+engines, which affected every team and is not relevant. These cases expose
+the limits of a search based only on words.
 
 % =====================================================================
 \section{CONCLUSION AND FUTURE WORK}
 \label{sec:conclusions}
-In this milestone we built a collection of 2058 documents about the history
-of Formula One, combining Jolpica F1 results with Wikipedia text through a
-reproducible pipeline that runs with a single command and records the
-versions of the data it used. We also analyzed the collection and defined
-ten information needs.
+We built a reproducible collection of 2058 Formula One documents,
+characterized it and defined ten information needs.
 
-In the next milestone, the collection will be indexed in Apache
-Solr~\cite{solr}. As the text is already split into fields, we will compare
-a simple setup with one that weights the most relevant fields and uses the
-structured fields as filters, evaluating both with the information needs
-above through precision at $k$ and mean average precision.
+The most challenging part was turning Wikipedia into usable text: the API
+blocks one-request-per-page clients, the wikitext mixes prose with tables
+and templates, and some links led to disambiguation pages. These were
+solved with batched and cached requests, a parser that keeps only the
+prose, and automatic link resolution.
+
+As future work, the collection will be indexed in Apache Solr~\cite{solr},
+comparing a single-field baseline with a setup that weights the most
+informative fields and filters by structured fields, both evaluated with
+precision at $k$ and mean average precision. The harder information needs
+will then serve to compare this word-based search with semantic search.
 
 % =====================================================================
 \onecolumn

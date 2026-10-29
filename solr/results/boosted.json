@@ -1,0 +1,122 @@
+{
+  "N1": [
+    "race_2012_05",
+    "race_2001_15",
+    "race_1995_08",
+    "race_1995_15",
+    "race_2008_10",
+    "race_2008_06",
+    "race_2021_07",
+    "race_2002_08",
+    "race_2014_07",
+    "race_2019_12"
+  ],
+  "N2": [
+    "race_1967_02",
+    "race_2019_11",
+    "race_1984_06",
+    "race_1996_07",
+    "race_1951_02",
+    "race_2007_03",
+    "race_2021_12",
+    "race_1975_12",
+    "race_2002_10",
+    "race_2017_02"
+  ],
+  "N3": [
+    "race_2010_09",
+    "race_1999_06",
+    "race_2010_17",
+    "race_2013_08",
+    "race_2026_12",
+    "race_2001_08",
+    "race_2021_22",
+    "race_2014_06",
+    "race_2014_03",
+    "race_2003_01"
+  ],
+  "N4": [
+    "race_1989_16",
+    "race_2004_06",
+    "race_2018_17",
+    "race_1990_02",
+    "race_1998_07",
+    "race_2025_10",
+    "race_1988_03",
+    "race_1981_12",
+    "race_1987_10",
+    "race_1987_03"
+  ],
+  "N5": [
+    "race_1977_03",
+    "race_1970_10",
+    "race_1994_03",
+    "race_1955_03",
+    "race_1982_05",
+    "race_1958_11",
+    "race_1960_05",
+    "race_1975_12",
+    "race_1973_10",
+    "race_1974_15"
+  ],
+  "N6": [
+    "race_1996_04",
+    "race_2004_08",
+    "race_1985_03",
+    "race_1984_08",
+    "race_1982_02",
+    "race_2025_02",
+    "race_2023_18",
+    "race_1983_01",
+    "race_1982_05",
+    "race_2000_02"
+  ],
+  "N7": [
+    "driver_crawford",
+    "driver_tornaco",
+    "driver_peter_walker",
+    "driver_zanardi",
+    "driver_donnelly",
+    "driver_niday",
+    "driver_grosjean",
+    "driver_kubica",
+    "driver_lauda",
+    "driver_jover"
+  ],
+  "N8": [
+    "driver_tingelstad",
+    "driver_scarborough",
+    "driver_foyt",
+    "driver_mcdowell",
+    "driver_papis",
+    "driver_schuppan",
+    "driver_bourdais",
+    "driver_bruni",
+    "driver_gurney",
+    "driver_sullivan"
+  ],
+  "N9": [
+    "team_simtek",
+    "team_marussia",
+    "team_tomaso",
+    "team_jordan",
+    "team_lago",
+    "team_minardi",
+    "team_frazer_nash",
+    "team_larrousse",
+    "team_lola",
+    "team_caterham"
+  ],
+  "N10": [
+    "team_brabham",
+    "team_team_lotus",
+    "team_tyrrell",
+    "team_arrows",
+    "team_bmw_sauber",
+    "team_toleman",
+    "team_brawn",
+    "team_alfa",
+    "team_shadow",
+    "team_sauber"
+  ]
+}

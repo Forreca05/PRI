@@ -1,0 +1,36 @@
+{
+    "systems": {
+        "simple": {
+            "defType": "edismax",
+            "qf": "title summary background qualifying race post_race other biography history layout events"
+        },
+        "boosted": {
+            "defType": "edismax",
+            "qf": "title^2 summary^3 background qualifying^2 race^2 post_race^2 other biography^2 history^2 layout events teams drivers",
+            "pf": "summary^4 qualifying^2 race^3 post_race^2 biography^3 history^3",
+            "ps": "3"
+        }
+    },
+    "needs": [
+        {"id": "N1",  "type": "race",   "need": "Races decided by a pit-stop or tyre strategy",
+         "q": "\"pit stop\" strategy undercut tyres \"two-stop\" \"one-stop\" gamble"},
+        {"id": "N2",  "type": "race",   "need": "Wet races with a surprising result",
+         "q": "rain wet surprise shock unexpected \"first win\" \"only three\""},
+        {"id": "N3",  "type": "race",   "need": "Safety car periods that changed the result",
+         "q": "\"safety car\" deployed restart lead advantage lost"},
+        {"id": "N4",  "type": "race",   "need": "Collisions between teammates",
+         "q": "teammates \"team-mate\" collided collision crashed together"},
+        {"id": "N5",  "type": "race",   "need": "Race weekends with a fatal accident",
+         "q": "fatal accident killed died death"},
+        {"id": "N6",  "type": "race",   "need": "Disqualifications for technical infringements",
+         "q": "disqualified disqualification illegal underweight technical infringement excluded"},
+        {"id": "N7",  "type": "driver", "need": "Drivers who returned after a serious injury",
+         "q": "serious injury injured recovered returned comeback hospital burns"},
+        {"id": "N8",  "type": "driver", "need": "Drivers who succeeded at Le Mans or Indianapolis",
+         "q": "\"Le Mans\" Indianapolis \"Indy 500\" won victory"},
+        {"id": "N9",  "type": "team",   "need": "Teams that collapsed for financial reasons",
+         "q": "financial bankrupt bankruptcy debts administration collapsed funding liquidation"},
+        {"id": "N10", "type": "team",   "need": "Technical innovations that were later banned",
+         "q": "innovation banned outlawed prohibited \"fan car\" \"six-wheeled\" \"ground effect\""}
+    ]
+}
