@@ -60,7 +60,7 @@ body {
 }
 main { max-width: 930px; margin: 0 auto; padding: 94px 24px 70px; }
 .hero { max-width: 760px; margin: 0 auto; }
-.eyebrow { color: var(--red); margin: 0 0 20px; }
+.eyebrow { color: var(--red); margin: 0 0 20px; font-size: 30px; }
 h1 {
   margin: 0;
   font: 600 clamp(52px, 8vw, 82px)/.98 "Space Grotesk", sans-serif;
