@@ -53,6 +53,21 @@ Cada passo também pode correr sozinho:
 | `make clean` | apaga tudo o que é gerado, **mantém** os downloads |
 | `make clean-all` | apaga também os downloads (o próximo `make` descarrega tudo de novo) |
 
+### Pesquisa interativa no Solr
+
+Depois de gerar `data/processed/documents.json` e iniciar o Docker Desktop, execute
+`bash solr/startup.sh` a partir da raiz do projeto para iniciar o Solr e indexar a
+coleção. Depois, inicie o site de pesquisa num segundo terminal:
+
+```bash
+python solr/webapp.py
+```
+
+Abra <http://localhost:8000>. Pode pesquisar por corridas, pilotos, equipas e
+circuitos, filtrar por tipo e escolher entre ranking simples e ranking com pesos.
+O servidor Solr tem de continuar ativo enquanto usa o site. Prima `Ctrl+C` no
+terminal do site para o parar.
+
 ---
 
 ## 2. Estrutura das pastas

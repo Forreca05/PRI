@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>F1 Search</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="F1 Search home"><span class="brand-mark">F1</span> ARCHIVE</a>
+    <span class="collection-status"><span class="status-dot"></span> SEARCH COLLECTION</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">THE FORMULA ONE ARCHIVE</p>
+      <h1>Every race has<br><span>a story.</span></h1>
+      <p class="intro">Search races, drivers, teams and circuits across F1 history.</p>
+
+      <form id="search-form" class="search-panel">
+        <label class="sr-only" for="query">Search the archive</label>
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="query" name="q" type="search" placeholder="Try “Hamilton first win” or “Monaco 1984”"
+               autocomplete="off" required>
+        <button type="submit">Search <span aria-hidden="true">→</span></button>
+        <div class="filters">
+          <label>TYPE
+            <select id="type">
+              <option value="all">Everything</option>
+              <option value="race">Races</option>
+              <option value="driver">Drivers</option>
+              <option value="team">Teams</option>
+              <option value="circuit">Circuits</option>
+            </select>
+          </label>
+          <label>RANKING
+            <select id="system">
+              <option value="boosted">Relevance (boosted)</option>
+              <option value="simple">Simple</option>
+            </select>
+          </label>
+        </div>
+      </form>
+
+      <div class="quick-searches" aria-label="Example searches">
+        <span>TRY</span>
+        <button type="button" data-query="Monaco rain">Monaco rain</button>
+        <button type="button" data-query="Lewis Hamilton">Lewis Hamilton</button>
+        <button type="button" data-query="Ferrari championship">Ferrari championship</button>
+      </div>
+    </section>
+
+    <section class="results-section" aria-live="polite">
+      <div id="results-heading" class="results-heading"></div>
+      <p id="message" class="message">Search the archive to explore more than 2,000 F1 documents.</p>
+      <div id="results" class="results"></div>
+      <nav id="pagination" class="pagination" aria-label="Search result pages" hidden>
+        <button id="previous" type="button">← Previous</button>
+        <span id="page-label"></span>
+        <button id="next" type="button">Next →</button>
+      </nav>
+    </section>
+  </main>
+  <footer><span>FORMULA ONE · 1950—2026</span><span>POWERED BY SOLR</span></footer>
+</body>
+</html>
