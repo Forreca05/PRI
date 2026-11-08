@@ -12,7 +12,7 @@
 
 \begin{document}
 
-\title{GRIDLY: SEARCHING THE HISTORY OF FORMULA 1}
+\title{GRIDLY: A SEARCH SYSTEM OVER FORMULA ONE HISTORICAL ARCHIVES}
 
 \author{Emilie Kernivinen}
 \email{up202306154@up.pt}
@@ -46,7 +46,7 @@
 
 \renewcommand{\abstractname}{ABSTRACT}
 \begin{abstract}
-  Formula One history is scattered across many sources. We build a search system that unifies it, combining race results and championship records from Jolpica F1 with English Wikipedia text, linked through Jolpica's article URLs. A reproducible pipeline collects, cleans and links the sources into 2058 documents (races, drivers, teams and circuits) from 1950 to 2026, totalling 2.8 million words.
+  Formula One history is divided between structured data, such as results and standings, and narrative text, such as race reports and driver biographies. We present Gridly, a search system that combines Jolpica F1 with English Wikipedia. A reproducible pipeline collects, cleans and links both sources into a document collection, which we characterize and use to define information needs for evaluating future search approaches.
 \end{abstract}
 
 
@@ -66,39 +66,40 @@
   Wikipedia, Jolpica F1, Data Preparation, Data Quality, Conceptual Model,
   Collection Characterization}
 
-
-\begin{teaserfigure}
-  \includegraphics[width=\textwidth]{imgs/teaser_1962.jpg}
-  \caption{Graham Hill in the BRM P57 at the 1962 Dutch Grand Prix, Zandvoort, the race that gave him his first World Championship win. Photo by Joop van Bilsen, Anefo / Nationaal Archief (CC0)~\cite{teaserimage}.}
-  \Description{Black and white photograph of a dark single-seater racing car
-  with the number 17 and exposed exhaust pipes, driven along the track with
-  spectators on the grass behind it.}
-  \label{fig:teaser}
-\end{teaserfigure}
-
 \maketitle
 
 
 % =====================================================================
 \section{INTRODUCTION}
-This work was developed for the course ``Information Processing and
-Retrieval'' (PRI) of the Master's in Informatics and Computing Engineering
-(M.EIC) at the Faculty of Engineering of the University of Porto (FEUP).
+Formula One is the highest class of single-seater motorsport, and its
+World Championship has been held every year since the first race in 1950
+\cite{f1history}. In more than seven decades, the sport has accumulated
+a very large historical record, with over a thousand races and hundreds
+of drivers, teams and circuits that have come and gone \cite{jolpica}.
+Interest in the sport has also grown in recent years: Formula 1 reports
+a global fanbase of 827 million in 2025, 63\% more than in 2018
+\cite{f1fans}, bringing many new followers who want to learn about its
+past but have no easy way to explore it.
 
-The choice of Formula One is motivated both by personal interest and by the
-nature of its data. Most of us follow the sport, but as relatively recent
-fans we wanted an easy way to learn about its history, which goes back to
-the first World Championship race in 1950. Information about its history comes in two forms:
-structured data, such as results and championship standings, and free text,
-such as race reports and driver biographies. Gaining deeper insight into a given topic often requires integrating both types of information, as they provide complementary perspectives. For
-example, finding races decided by a late mechanical failure requires
-matching the retirement reason in the results with the narrative of the
-race, which makes Formula One a good domain for an information retrieval
-system close to a real-world scenario.
+This history is available in two forms, which are rarely found together.
+Structured data, such as race results, retirement reasons and
+championship standings, is maintained by open projects like Jolpica F1
+\cite{jolpica}, the successor to the Ergast API. Free text, such as race
+reports, driver biographies and team histories, is found mainly in
+collaborative encyclopedias like Wikipedia \cite{wikipedia}. Each form
+answers different questions: the results show what happened, while the
+text explains why. Finding races decided by a late mechanical failure,
+for example, requires matching the retirement reason in the results with
+the narrative of the race. Answering this kind of question is the
+purpose of an information retrieval system \cite{manning2008}, and it
+makes Formula One a good domain for one close to a real-world scenario.
 
-Section~\ref{sec:dataset} describes the dataset, including its sources, preparation, quality, structure, and characterization.
-Section~\ref{sec:needs} presents the search scenarios, and
-Section~\ref{sec:conclusions} concludes and outlines future work.
+In this project, we present Gridly, a search system that integrates both
+types of information. The remainder of this paper is organized as
+follows: Section~\ref{sec:dataset} describes the dataset, including its sources,
+preparation, quality, structure, and characterization. Section~\ref{sec:needs}
+presents the search scenarios, and Section~\ref{sec:conclusions} concludes and outlines
+future work.
 
 % =====================================================================
 \section{DATASET}
@@ -141,7 +142,7 @@ The two sources are linked directly through Jolpica, which stores the Wikipedia
 URL of each race, driver, team and circuit. This avoids matching by name,
 which would be error-prone for drivers with the same name or races whose
 title changed over the years. Both sources are released under open licenses (CC
-BY-NC-SA 4.0 for Jolpica and CC BY-SA 4.0 for Wikipedia) that permit their use in an academic project.
+BY-NC-SA 4.0 for Jolpica and CC BY-SA 4.0 for Wikipedia) that allows their use in an academic project.
 
 \subsection{Data Preparation}
 \label{sec:pipeline}
@@ -222,8 +223,7 @@ the retirement reasons, one of the most useful structured fields.
 
 Most of the 164 \textbf{short documents} are drivers from the 1950s with one
 or two races, whose article is a single sentence followed by a table. The
-threshold was chosen by inspecting these articles: raising it to 150 words
-would reject 111 more documents, many of them with useful text.
+threshold was chosen by inspecting these articles: raising it to 150 words would reject 111 more documents, many of them with useful text.
 
 \begin{table}[ht]
   \small
@@ -314,18 +314,6 @@ of identifiers in both directions (e.g., \texttt{driver\_ids} in a race and
 \texttt{race\_ids} in a driver), allowing the search system to move from a
 document to the related ones.
 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=\linewidth]{imgs/conceptual_model.png}
-  \caption{Domain conceptual model}
-  \Description{UML class diagram. An abstract Document class with the common
-  fields is specialized into RaceDocument, DriverDocument, TeamDocument and
-  CircuitDocument, each listing its attributes. Driver and Race are linked
-  one-or-more to one-or-more, Driver and Team one-or-more to one-or-more,
-  Race and Team two-or-more to zero-or-more, and Race to exactly one
-  Circuit. A collection class stores the 2058 documents.}
-  \label{fig:model}
-\end{figure}
 
 \subsection{Data Characterization}
 \label{sec:characterization}
@@ -342,6 +330,14 @@ community of editors, while older races were documented later and with
 fewer sources. This matters for the search system: a long document has more
 chances of matching a query, so a ranking that does not normalize length
 well will tend to favor recent races.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\columnwidth]{imgs/race_words_by_decade.png}
+  \caption{Median words per race document, by decade}
+  \Description{Bar chart of median words per race from the 1950s to the 2020s. The values stay between about 320 and 430 until the 1970s, rise to about 650 to 700 in the 1980s and 1990s, peak at about 1850 in the 2000s and then decrease to about 1540 and 1290.}
+  \label{fig:decade}
+\end{figure}
 
 The collection has 2.79 million tokens and a vocabulary of 34348 terms,
 37\% of which appear only once. Stopwords make up 45\% of all
@@ -400,12 +396,20 @@ a summary and 85\% have a race report, but only 42\% describe qualifying
 and 27\% the aftermath (Figure~\ref{fig:coverage}), so some queries can only
 be answered for part of the collection, mostly recent seasons.
 
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\columnwidth]{imgs/retirement_reasons.png}
+  \caption{Most common retirement reasons}
+  \Description{Horizontal bar chart of retirement reasons. Engine is the most common with 1889 cases, followed by accident, collision, spun off and gearbox.}
+  \label{fig:retirements}
+\end{figure}
+
 % =====================================================================
 \section{SEARCH SCENARIOS}
 \label{sec:needs}
 Table~\ref{tab:needs} lists the information needs used to
 evaluate the system. They were chosen so that they depend on the text and
-not only on the structured fields, cover three document types, can be
+not only on the structured fields, cover all four document types, can be
 expressed with varied vocabulary, and have answers in the collection, which
 we confirmed by finding relevant documents for each. For each need we
 defined what makes a document relevant and what does not. In N2, for
@@ -429,13 +433,16 @@ cars finished. A wet race won by the favorite is not relevant.
     N8 & Drivers who succeeded at Le Mans or Indianapolis & driver \\
     N9 & Teams that collapsed for financial reasons & team \\
     N10 & Technical innovations that were later banned & team \\
+    N11 & Teams that were renamed or taken over by another company & team \\
+    N12 & Circuits whose layout was changed after a serious accident & circuit \\
+    N13 & Circuits that drivers boycotted or considered too dangerous & circuit \\
     \bottomrule
   \end{tabular}
   \caption{Information needs}
   \label{tab:needs}
 \end{table}
 
-Some needs are hard on purpose. In N1, the same idea appears as
+We deliberately included some needs that are hard to satisfy. In N1, the same idea appears as
 ``undercut'', ``two-stop strategy'' or ``gambled on not needing a pit
 stop''; in N4, the text often gives only the two names, so the
 \texttt{teams} field is needed; N7 has few documents that use the words of
@@ -445,10 +452,123 @@ engines, which affected every team and is not relevant. These cases expose
 the limits of a search based only on words.
 
 % =====================================================================
+\section{INFORMATION RETRIEVAL}
+\label{sec:ir}
+The collection is indexed in Apache Solr~\cite{solr} 10, running in a Docker
+container. A single script creates the container, loads the schema and
+indexes the documents, so the index can be rebuilt from scratch at any time.
+Solr ranks documents with BM25~\cite{manning2008}, its default similarity.
+
+\subsection{Document Model and Indexing}
+\label{sec:indexing}
+Each race, driver, team and circuit is one flat Solr document, identified by
+\texttt{id} and labeled by \texttt{type}. Entities are linked by identifier
+fields instead of nested documents, so each result is always one complete
+entity. Table~\ref{tab:schema} summarizes how the fields are indexed.
+
+\begin{table}[ht]
+  \small
+  \begin{tabular}{p{1.3cm}p{3cm}p{2.85cm}}
+    \toprule
+    Type & Processing & Fields \\
+    \midrule
+    \texttt{f1\_text} & Standard tokenizer, English possessives, ASCII
+    folding, lowercase, English stop words, Porter stemming &
+    Wikipedia sections (\texttt{summary}, \texttt{race},
+    \texttt{biography}, \texttt{history}, \ldots) and \texttt{all\_text} \\
+    \texttt{f1\_name} & Standard tokenizer, ASCII folding, lowercase &
+    \texttt{title}, \texttt{winner}, \texttt{drivers}, \texttt{teams},
+    \texttt{circuit}, \ldots \\
+    \texttt{string} & None (exact value) & \texttt{type}, \texttt{country},
+    \texttt{nationality}, identifiers \\
+    Numeric & None & \texttt{season}, \texttt{wins}, \texttt{starters},
+    \ldots \\
+    Date range & None & \texttt{date}, \texttt{date\_of\_birth} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Indexed field types}
+  \label{tab:schema}
+\end{table}
+
+Narrative text is stemmed so that different word forms match, while names
+are not, because stemming would distort them. ASCII folding keeps both the
+original and the folded token, so a query without diacritics still finds the
+name. The same analysis is applied at index and query time. For example,
+\textit{``Räikkönen's crashing in the rain''} produces the tokens
+\texttt{raikkonen}, \texttt{räikkönen}, \texttt{crash} and \texttt{rain}.
+The \texttt{all\_text} field is a copy of the title and all Wikipedia
+sections, used only by the baseline. Date range fields accept the dates in
+the format found in the data, such as \texttt{1950-05-13}, and still support
+range filters.
+
+\subsection{Retrieval Setups}
+\label{sec:setups}
+Both setups use the eDisMax query parser and the same query text for each
+information need. They return the top 10 documents ordered only by relevance
+score, which is never replaced by another sort order. Table~\ref{tab:setups}
+shows how they differ.
+
+\begin{table}[ht]
+  \small
+  \begin{tabular}{p{1.4cm}p{1.6cm}p{4.1cm}}
+    \toprule
+    & Baseline & Boosted \\
+    \midrule
+    Search fields (\texttt{qf}) & \texttt{all\_text} &
+    weight 3: \texttt{summary}; weight 2: \texttt{title},
+    \texttt{qualifying}, \texttt{race}, \texttt{post\_race},
+    \texttt{biography}, \texttt{history}; weight 1: \texttt{background},
+    \texttt{other}, \texttt{layout}, \texttt{events}, \texttt{teams},
+    \texttt{drivers} \\
+    Phrase boost (\texttt{pf}, \texttt{ps}) & None &
+    weight 4: \texttt{summary}; weight 3: \texttt{race},
+    \texttt{biography}, \texttt{history}; weight 2: \texttt{qualifying},
+    \texttt{post\_race}; slop 3 \\
+    Filter (\texttt{fq}) & None & \texttt{type} of the need \\
+    \bottomrule
+  \end{tabular}
+  \caption{Retrieval setups}
+  \label{tab:setups}
+\end{table}
+
+The boosted setup gives the highest weight to \texttt{summary}, which
+concentrates the main facts of an article, and more weight to the sections
+that narrate what happened than to background material. The \texttt{teams}
+and \texttt{drivers} fields are included because a race text often names two
+drivers without saying that they are teammates, as in N4. Weights were set
+manually while exploring the queries in the Solr interface.
+
+\subsection{Demonstration}
+\label{sec:demo}
+Besides the Solr interface, a small web application lets a user type a
+query, restrict it to a document type and switch between the two setups.
+% TODO: add a screenshot of the web application
+For N3 we use the query
+\texttt{"safety car" deployed restart lead advantage lost}. The baseline
+matches 1422 documents and the boosted setup 984, because the filter leaves
+only races, and their top 10 lists have no document in common
+(Table~\ref{tab:demo}).
+
+\begin{table}[ht]
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    Rank & Baseline & Boosted \\
+    \midrule
+    1 & 2017 Azerbaijan GP & 2010 European GP \\
+    2 & 2026 Canadian GP & 1999 Canadian GP \\
+    3 & 2006 Australian GP & 2010 Korean GP \\
+    \bottomrule
+  \end{tabular}
+  \caption{Top results for N3 in each setup}
+  \label{tab:demo}
+\end{table}
+
+% =====================================================================
 \section{CONCLUSION AND FUTURE WORK}
 \label{sec:conclusions}
 We built a reproducible collection of 2058 Formula One documents,
-characterized it and defined ten information needs.
+characterized it and defined thirteen information needs for our future work.
 
 The most challenging part was turning Wikipedia into usable text: the API
 blocks one-request-per-page clients, the wikitext mixes prose with tables
@@ -472,6 +592,7 @@ will then serve to compare this word-based search with semantic search.
 
 \columnbreak
 \setcounter{section}{0}
+
 \section{Example Document}
 \label{sec:example}
 Abridged race document (\texttt{race\_2021\_22}); long lists and texts are
@@ -533,10 +654,10 @@ cut with ``\ldots''.
   \centering
   \begin{minipage}[t]{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{imgs/race_words_by_decade.png}
-    \caption{Median words per race document, by decade}
-    \Description{Bar chart of median words per race from the 1950s to the 2020s. The values stay between about 320 and 430 until the 1970s, rise to about 650 to 700 in the 1980s and 1990s, peak at about 1850 in the 2000s and then decrease to about 1540 and 1290.}
-    \label{fig:decade}
+    \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{imgs/driver_nationalities.png}
+    \caption{Driver nationalities}
+    \Description{Horizontal bar chart of driver nationalities. British (142) and American (131) are the largest groups, followed by Italian, French and German.}
+    \label{fig:nationalities}
   \end{minipage}
   \hfill
   \begin{minipage}[t]{0.48\textwidth}
@@ -548,24 +669,6 @@ cut with ``\ldots''.
   \end{minipage}
 \end{figure}
 
-\begin{figure}[H]
-  \centering
-  \begin{minipage}[t]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{imgs/retirement_reasons.png}
-    \caption{Most common retirement reasons}
-    \Description{Horizontal bar chart of retirement reasons. Engine is the most common with 1889 cases, followed by accident, collision, spun off and gearbox.}
-    \label{fig:retirements}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\linewidth,height=3.5cm,keepaspectratio]{imgs/driver_nationalities.png}
-    \caption{Driver nationalities}
-    \Description{Horizontal bar chart of driver nationalities. British (142) and American (131) are the largest groups, followed by Italian, French and German.}
-    \label{fig:nationalities}
-  \end{minipage}
-\end{figure}
 
 \begin{figure}[H]
   \centering
@@ -607,5 +710,17 @@ cut with ``\ldots''.
   \label{fig:topterms}
   \end{minipage}
 \end{figure}
+
+\clearpage
+\section{Domain Conceptual Domain}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,
+                   height=0.95\textheight,
+                   keepaspectratio]{imgs/conceptual_model.png}
+  \caption{Domain conceptual model.}
+  \label{fig:model}
+\end{figure}
+
 
 \end{document}

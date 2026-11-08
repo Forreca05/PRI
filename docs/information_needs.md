@@ -10,7 +10,7 @@
 1. **Dependem do texto.** Perguntas que se respondem só com os campos estruturados
    ("quem ganhou o GP de Abu Dhabi 2021?", "pilotos portugueses") não servem para
    avaliar pesquisa em texto e foram excluídas.
-2. **Cobrem os três tipos de documento**: 6 sobre corridas, 2 sobre pilotos, 2 sobre equipas.
+2. **Cobrem os quatro tipos de documento**: 6 sobre corridas, 2 sobre pilotos, 3 sobre equipas e 2 sobre circuitos.
 3. **Têm variação de vocabulário.** O mesmo conceito aparece escrito de várias formas
    ("undercut", "two-stop strategy", "gambled on not needing a pit stop"), o que torna a
    pesquisa lexical (BM25) difícil e dá espaço à pesquisa semântica no M3.
@@ -36,6 +36,9 @@ A relevância a sério é avaliada manualmente no M2.
 | N8 | Pilotos com sucesso em Le Mans ou Indianapolis | driver | ~63 |
 | N9 | Equipas que fecharam por problemas financeiros | team | ~21 |
 | N10 | Inovações técnicas que acabaram proibidas | team | ~11 |
+| N11 | Equipas renomeadas ou compradas | team | — |
+| N12 | Circuitos alterados depois de um acidente grave | circuit | — |
+| N13 | Circuitos boicotados ou considerados demasiado perigosos | circuit | — |
 
 ---
 
@@ -48,7 +51,7 @@ A relevância a sério é avaliada manualmente no M2.
   escolha de pneus) foi decisiva para quem ganhou.
 - **Não relevante:** a corrida só menciona paragens de rotina, ou a estratégia só
   afetou posições fora da luta pela vitória.
-- **Query:** `tyre strategy pit stop decided win`
+- **Query:** `"pit stop" strategy undercut tyres "two-stop" "one-stop" gamble`
 - **Vocabulário variado:** undercut, overcut, one-stop, two-stop, "gambled", "pitted early",
   "switched to a three-stop strategy".
 - **Exemplos confirmados:**
@@ -66,7 +69,7 @@ A relevância a sério é avaliada manualmente no M2.
   invulgar (primeira vitória, equipa pequena, poucos a terminar).
 - **Não relevante:** corrida à chuva ganha pelo favorito sem nada de especial, ou
   resultado surpreendente sem relação com o tempo.
-- **Query:** `rain wet race surprise first win`
+- **Query:** `rain wet surprise shock unexpected "first win" "only three"`
 - **Vocabulário variado:** rain, wet, downpour, "track dried", "wet-weather tyres";
   maiden win, "first in Formula One", "only drivers who finished".
 - **Exemplos confirmados:**
@@ -83,7 +86,7 @@ A relevância a sério é avaliada manualmente no M2.
 - **Relevante:** o safety car teve efeito claro na classificação final ou na luta pela
   vitória, ou a sua gestão foi polémica.
 - **Não relevante:** o safety car só é mencionado de passagem, sem impacto no resultado.
-- **Query:** `safety car changed result controversy`
+- **Query:** `"safety car" deployed restart lead advantage lost`
 - **Vocabulário variado:** safety car, virtual safety car, restart, "neutralised",
   "pitted under the safety car", "race director".
 - **Exemplos confirmados:**
@@ -98,7 +101,7 @@ A relevância a sério é avaliada manualmente no M2.
 - **Tipo:** race
 - **Relevante:** colisão (ou contacto) entre dois pilotos da mesma equipa durante a corrida.
 - **Não relevante:** colisões entre pilotos de equipas diferentes; "quase colisões".
-- **Query:** `teammates collided collision same team`
+- **Query:** `teammates "team-mate" collided collision crashed together`
 - **Vocabulário variado:** collided, collision, contact, "took each other out",
   "tangled", "both Mercedes drivers retired".
 - **Exemplos confirmados:**
@@ -117,7 +120,7 @@ A relevância a sério é avaliada manualmente no M2.
   qualificação ou corrida).
 - **Não relevante:** mortes noutros eventos só referidas como contexto; acidentes graves
   sem vítimas mortais.
-- **Query:** `fatal accident driver killed`
+- **Query:** `fatal accident killed died death`
 - **Vocabulário variado:** fatal, killed, died, "lost their lives", "death of", "succumbed to injuries".
 - **Exemplos confirmados:**
   - *1994 San Marino GP*: "Roland Ratzenberger and… Ayrton Senna lost their lives in separate accidents"
@@ -137,7 +140,7 @@ A relevância a sério é avaliada manualmente no M2.
   **técnico**.
 - **Não relevante:** desqualificações por comportamento (ex.: ignorar bandeira preta,
   empurrar o carro) ou penalizações de tempo.
-- **Query:** `disqualified excluded technical infringement underweight fuel`
+- **Query:** `disqualified disqualification illegal underweight technical infringement excluded`
 - **Vocabulário variado:** disqualified, excluded, "did not meet the minimum weight",
   "fuel samples", "plank wear", "illegal".
 - **Exemplos confirmados:**
@@ -154,7 +157,7 @@ A relevância a sério é avaliada manualmente no M2.
 - **Relevante:** a biografia descreve uma lesão grave **e** o regresso à competição.
 - **Não relevante:** lesões sem paragem da carreira; lesões que acabaram com a
   carreira; mortes.
-- **Query:** `seriously injured crash returned to racing comeback`
+- **Query:** `serious injury injured recovered returned comeback hospital burns`
 - **Vocabulário variado:** "seriously injured", "suffering severe burns", "broke both legs",
   "skull fracture", recovered, returned, comeback.
 - **Exemplos confirmados:**
@@ -175,7 +178,7 @@ A relevância a sério é avaliada manualmente no M2.
 - **Relevante:** a biografia refere uma vitória ou um resultado de destaque em Le Mans ou na Indy 500.
 - **Não relevante:** só participação sem resultado relevante; menções a Le Mans por
   outros motivos (ex.: o acidente de 1955 como contexto).
-- **Query:** `won Le Mans Indianapolis 500`
+- **Query:** `"Le Mans" Indianapolis "Indy 500" won victory`
 - **Vocabulário variado:** "24 Hours of Le Mans", "Le Mans 24 Hours", "Indy 500",
   "Indianapolis 500", "American open-wheel racing", "endurance racing".
 - **Exemplos confirmados:**
@@ -193,7 +196,7 @@ A relevância a sério é avaliada manualmente no M2.
   dificuldades financeiras.
 - **Não relevante:** equipas vendidas ou renomeadas sem crise financeira; problemas
   financeiros que a equipa ultrapassou.
-- **Query:** `team collapsed financial difficulties administration bankrupt`
+- **Query:** `financial bankrupt bankruptcy debts administration collapsed funding liquidation`
 - **Vocabulário variado:** bankrupt, "entered administration", receivership, liquidated,
   debts, "unpaid bills", "collapsed financially", "withdrew due to financial difficulties".
 - **Exemplos confirmados:**
@@ -211,7 +214,7 @@ A relevância a sério é avaliada manualmente no M2.
   proibida.
 - **Não relevante:** proibições gerais que afetaram todos por igual (ex.: o fim dos turbos
   em 1989) sem inovação da equipa; inovações que nunca foram proibidas.
-- **Query:** `innovation banned fan car active suspension double diffuser`
+- **Query:** `innovation banned outlawed prohibited "fan car" "six-wheeled" "ground effect"`
 - **Vocabulário variado:** banned, outlawed, prohibited, "declared illegal"; fan car,
   six-wheeler, ground effect, active suspension, mass damper, double diffuser, DAS.
 - **Exemplos confirmados:**
@@ -224,11 +227,53 @@ A relevância a sério é avaliada manualmente no M2.
   que afetou todas as equipas, e isso não conta como relevante. É uma boa
   necessidade para mostrar os limites da pesquisa lexical.
 
+## N11 — Equipas renomeadas ou compradas
+
+- **Description (EN):** Teams that were renamed or taken over by another company or owner.
+- **Tipo:** team
+- **Relevante:** o texto diz que a equipa mudou de nome por venda ou compra, ou que foi adquirida por outra empresa ou proprietário.
+- **Não relevante:** mudanças só de patrocinador ou de motor; equipas que apenas fecharam.
+- **Query:** `renamed rebranded "taken over" takeover bought purchased acquired sold`
+- **Vocabulário variado:** renamed, rebranded, "taken over", takeover, bought, purchased, acquired, sold.
+- **Exemplos confirmados:**
+  - *Stewart*: "At the end of 1999, Ford bought the team outright and it was renamed Jaguar Racing."
+  - *MF1*: "The team was created by the renaming of Jordan Grand Prix after its purchase by Canadian businessman… Alex Shnaider."
+  - *Lotus F1*: "The team was sold back to Renault on 18 December 2015."
+  - *Racing Point*: "The team was renamed in February 2019 from Racing Point Force India F1 Team"
+
+## N12 — Circuitos alterados depois de um acidente grave
+
+- **Description (EN):** Circuits whose layout was changed as a consequence of a serious accident.
+- **Tipo:** circuit
+- **Relevante:** o texto liga uma alteração do traçado (chicane, curva redesenhada, encurtamento) a um acidente grave.
+- **Não relevante:** acidentes sem alteração do traçado; alterações por razões comerciais ou de comprimento, sem ligação a um acidente.
+- **Query:** `accident crash fatal death chicane redesigned modified safety layout changed altered`
+- **Vocabulário variado:** chicane, redesigned, modified, altered, "safety concerns", fatal, crash.
+- **Exemplos confirmados:**
+  - *Watkins Glen*: "minor modifications after the fatal crashes of François Cevert (1973), Helmut Koinigg (1974)"
+  - *Hockenheimring*: "After Jim Clark was killed on 7 April 1968 in a Formula 2 racing accident, two fast chicanes were added"
+  - *Autódromo do Estoril*: "After the death of Ayrton Senna at the 1994 San Marino Grand Prix, a chicane was added"
+- **Nota:** tem ruído: muitos circuitos falam de acidentes e de alterações, sem dizer que uma coisa causou a outra.
+
+## N13 — Circuitos boicotados ou considerados demasiado perigosos
+
+- **Description (EN):** Circuits that drivers boycotted, refused to race at, or that were described as too dangerous for racing.
+- **Tipo:** circuit
+- **Relevante:** o texto diz que os pilotos ou as equipas boicotaram ou recusaram correr no circuito por razões de segurança, ou que o circuito foi considerado demasiado perigoso.
+- **Não relevante:** boicotes por razões políticas ou contratuais, sem relação com a segurança do circuito; acidentes referidos sem crítica à segurança do circuito.
+- **Query:** `boycott boycotted refused dangerous unsafe "safety concerns" protest criticized drivers`
+- **Vocabulário variado:** boycott, "refused to race", "too dangerous", "deemed unsafe", "safety concerns".
+- **Exemplos confirmados:**
+  - *Circuit de Spa-Francorchamps*: "In 1969, the Belgian Grand Prix was boycotted by Formula One drivers due to the extreme danger."
+  - *Nürburgring*: "the F1 drivers decided at the French Grand Prix to boycott the Nürburgring unless major changes were made"
+  - *Nivelles-Baulers*: "By 1980 the circuit was deemed too dangerous for car racing"
+- **Nota:** cuidado com falsos positivos. No *Autódromo Internacional Nelson Piquet* e em *Kyalami*, os boicotes e greves referidos tiveram outras causas.
+
 ---
 
 ## Próximos passos
 
-1. **Grupo:** rever as 10, cortar ou juntar as mais fracas e afinar os critérios de relevância.
+1. **Grupo:** rever as 13, cortar ou juntar as mais fracas e afinar os critérios de relevância.
 2. **Relatório M1:** usar as descrições em inglês na secção "Information needs".
 3. **M2:** para cada necessidade, correr a query nos dois setups do Solr, juntar os
    top-k de ambos (pooling) e avaliar à mão cada documento como relevante ou não,

@@ -2,7 +2,8 @@
     "systems": {
         "simple": {
             "defType": "edismax",
-            "qf": "title summary background qualifying race post_race other biography history layout events"
+            "qf": "all_text",
+            "filter_type": false
         },
         "boosted": {
             "defType": "edismax",
@@ -12,25 +13,31 @@
         }
     },
     "needs": [
-        {"id": "N1",  "type": "race",   "need": "Races decided by a pit-stop or tyre strategy",
+        {"id": "N1",  "type": "race",    "need": "Races decided by a pit-stop or tyre strategy",
          "q": "\"pit stop\" strategy undercut tyres \"two-stop\" \"one-stop\" gamble"},
-        {"id": "N2",  "type": "race",   "need": "Wet races with a surprising result",
+        {"id": "N2",  "type": "race",    "need": "Wet races with a surprising result",
          "q": "rain wet surprise shock unexpected \"first win\" \"only three\""},
-        {"id": "N3",  "type": "race",   "need": "Safety car periods that changed the result",
+        {"id": "N3",  "type": "race",    "need": "Safety car periods that changed the result",
          "q": "\"safety car\" deployed restart lead advantage lost"},
-        {"id": "N4",  "type": "race",   "need": "Collisions between teammates",
+        {"id": "N4",  "type": "race",    "need": "Collisions between teammates",
          "q": "teammates \"team-mate\" collided collision crashed together"},
-        {"id": "N5",  "type": "race",   "need": "Race weekends with a fatal accident",
+        {"id": "N5",  "type": "race",    "need": "Race weekends with a fatal accident",
          "q": "fatal accident killed died death"},
-        {"id": "N6",  "type": "race",   "need": "Disqualifications for technical infringements",
+        {"id": "N6",  "type": "race",    "need": "Disqualifications for technical infringements",
          "q": "disqualified disqualification illegal underweight technical infringement excluded"},
-        {"id": "N7",  "type": "driver", "need": "Drivers who returned after a serious injury",
+        {"id": "N7",  "type": "driver",  "need": "Drivers who returned after a serious injury",
          "q": "serious injury injured recovered returned comeback hospital burns"},
-        {"id": "N8",  "type": "driver", "need": "Drivers who succeeded at Le Mans or Indianapolis",
+        {"id": "N8",  "type": "driver",  "need": "Drivers who succeeded at Le Mans or Indianapolis",
          "q": "\"Le Mans\" Indianapolis \"Indy 500\" won victory"},
-        {"id": "N9",  "type": "team",   "need": "Teams that collapsed for financial reasons",
+        {"id": "N9",  "type": "team",    "need": "Teams that collapsed for financial reasons",
          "q": "financial bankrupt bankruptcy debts administration collapsed funding liquidation"},
-        {"id": "N10", "type": "team",   "need": "Technical innovations that were later banned",
-         "q": "innovation banned outlawed prohibited \"fan car\" \"six-wheeled\" \"ground effect\""}
+        {"id": "N10", "type": "team",    "need": "Technical innovations that were later banned",
+         "q": "innovation banned outlawed prohibited \"fan car\" \"six-wheeled\" \"ground effect\""},
+        {"id": "N11", "type": "team",    "need": "Teams that were renamed or taken over by another company",
+         "q": "renamed rebranded \"taken over\" takeover bought purchased acquired sold"},
+        {"id": "N12", "type": "circuit", "need": "Circuits whose layout was changed after a serious accident",
+         "q": "accident crash fatal death chicane redesigned modified safety layout changed altered"},
+        {"id": "N13", "type": "circuit", "need": "Circuits that drivers boycotted or considered too dangerous",
+         "q": "boycott boycotted refused dangerous unsafe \"safety concerns\" protest criticized drivers"}
     ]
 }

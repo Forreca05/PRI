@@ -14,13 +14,17 @@ import urllib.request
 SOLR = 'http://localhost:8983/solr/f1/select'
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOP = 10
-SNIPPET_FIELDS = 'summary,background,qualifying,race,post_race,other,biography,history'
+SNIPPET_FIELDS = 'summary,background,qualifying,race,post_race,other,biography,history,layout,events'
 
 
 def search(params: dict, need: dict) -> list:
-    query = {**params, 'q': need['q'], 'fq': f'type:{need["type"]}', 'fl': 'id,title,score',
+    params = dict(params)
+    filter_type = params.pop('filter_type', True)  # the baseline searches the whole collection
+    query = {**params, 'q': need['q'], 'fl': 'id,title,score',
              'rows': TOP, 'hl': 'true', 'hl.fl': SNIPPET_FIELDS, 'hl.snippets': 2,
              'hl.fragsize': 160, 'hl.method': 'unified'}
+    if filter_type:
+        query['fq'] = f'type:{need["type"]}'
     with urllib.request.urlopen(f'{SOLR}?{urllib.parse.urlencode(query)}') as response:
         data = json.load(response)
     docs = data['response']['docs']

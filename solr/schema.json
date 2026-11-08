@@ -105,6 +105,21 @@
         {"name": "wikipedia_revid",    "type": "plong",   "indexed": true, "stored": true},
 
         {"name": "date",               "type": "f1_date", "indexed": true, "stored": true},
-        {"name": "date_of_birth",      "type": "f1_date", "indexed": true, "stored": true}
+        {"name": "date_of_birth",      "type": "f1_date", "indexed": true, "stored": true},
+
+        {"name": "all_text",           "type": "f1_text", "indexed": true, "stored": false, "multiValued": true}
+    ],
+    "add-copy-field": [
+        {"source": "title",      "dest": "all_text"},
+        {"source": "summary",    "dest": "all_text"},
+        {"source": "background", "dest": "all_text"},
+        {"source": "qualifying", "dest": "all_text"},
+        {"source": "race",       "dest": "all_text"},
+        {"source": "post_race",  "dest": "all_text"},
+        {"source": "other",      "dest": "all_text"},
+        {"source": "biography",  "dest": "all_text"},
+        {"source": "history",    "dest": "all_text"},
+        {"source": "layout",     "dest": "all_text"},
+        {"source": "events",     "dest": "all_text"}
     ]
 }

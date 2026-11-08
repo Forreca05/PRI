@@ -118,5 +118,41 @@
     "team_alfa",
     "team_shadow",
     "team_sauber"
+  ],
+  "N11": [
+    "team_stewart",
+    "team_mf1",
+    "team_renault",
+    "team_virgin",
+    "team_sauber",
+    "team_tomaso",
+    "team_racing_point",
+    "team_bar",
+    "team_lago",
+    "team_team_lotus"
+  ],
+  "N12": [
+    "circuit_spa",
+    "circuit_rodriguez",
+    "circuit_riverside",
+    "circuit_monza",
+    "circuit_watkins_glen",
+    "circuit_detroit",
+    "circuit_imola",
+    "circuit_nurburgring",
+    "circuit_hockenheimring",
+    "circuit_kyalami"
+  ],
+  "N13": [
+    "circuit_spa",
+    "circuit_jacarepagua",
+    "circuit_rodriguez",
+    "circuit_imola",
+    "circuit_yeongam",
+    "circuit_charade",
+    "circuit_sepang",
+    "circuit_nurburgring",
+    "circuit_interlagos",
+    "circuit_indianapolis"
   ]
 }
