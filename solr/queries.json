@@ -8,8 +8,8 @@
         "boosted": {
             "defType": "edismax",
             "qf": "title^2 summary^3 background qualifying^2 race^2 post_race^2 other biography^2 history^2 layout events teams drivers",
-            "pf": "summary^4 qualifying^2 race^3 post_race^2 biography^3 history^3",
-            "ps": "3"
+            "pf2": "summary^4 qualifying^2 race^3 post_race^2 biography^3 history^3",
+            "ps2": "3"
         }
     },
     "needs": [

@@ -454,100 +454,158 @@ the limits of a search based only on words.
 % =====================================================================
 \section{INFORMATION RETRIEVAL}
 \label{sec:ir}
-The collection is indexed in Apache Solr~\cite{solr} 10, running in a Docker
-container. A single script creates the container, loads the schema and
-indexes the documents, so the index can be rebuilt from scratch at any time.
-Solr ranks documents with BM25~\cite{manning2008}, its default similarity.
+To search the collection we use Apache Solr~\cite{solr}, an open-source
+search platform. Solr receives the documents, organizes their content in an
+index that makes search fast, and answers each query with a list of documents
+ordered by relevance. This order is computed with BM25~\cite{manning2008},
+Solr's default ranking function. BM25 gives more weight to words that are rare
+in the collection and compensates for document length, which matters here
+because the length of our documents is very uneven
+(Section~\ref{sec:characterization}). Solr runs in a Docker container, and a
+single script creates the container, defines the fields and loads the
+documents, so the whole index can be rebuilt at any time.
 
-\subsection{Document Model and Indexing}
+\subsection{What Is Indexed}
 \label{sec:indexing}
-Each race, driver, team and circuit is one flat Solr document, identified by
-\texttt{id} and labeled by \texttt{type}. Entities are linked by identifier
-fields instead of nested documents, so each result is always one complete
-entity. Table~\ref{tab:schema} summarizes how the fields are indexed.
+Each race, driver, team and circuit is a separate document, so every search
+result is one complete entity that a user can read on its own. Relations
+between documents are kept as lists of identifiers, as described in
+Section~\ref{sec:model}.
+
+Not all fields should be searched in the same way. A race report is free text,
+a driver's name must not be altered, and a season is a number. We therefore
+grouped the fields into the five kinds shown in Table~\ref{tab:schema}. All
+fields are indexed except the Wikipedia URL, which is only displayed.
 
 \begin{table}[ht]
   \small
-  \begin{tabular}{p{1.3cm}p{3cm}p{2.85cm}}
+  \begin{tabular}{p{1.6cm}p{3.3cm}p{2.3cm}}
     \toprule
-    Type & Processing & Fields \\
+    Kind & Examples & Search behavior \\
     \midrule
-    \texttt{f1\_text} & Standard tokenizer, English possessives, ASCII
-    folding, lowercase, English stop words, Porter stemming &
-    Wikipedia sections (\texttt{summary}, \texttt{race},
-    \texttt{biography}, \texttt{history}, \ldots) and \texttt{all\_text} \\
-    \texttt{f1\_name} & Standard tokenizer, ASCII folding, lowercase &
-    \texttt{title}, \texttt{winner}, \texttt{drivers}, \texttt{teams},
-    \texttt{circuit}, \ldots \\
-    \texttt{string} & None (exact value) & \texttt{type}, \texttt{country},
-    \texttt{nationality}, identifiers \\
-    Numeric & None & \texttt{season}, \texttt{wins}, \texttt{starters},
-    \ldots \\
-    Date range & None & \texttt{date}, \texttt{date\_of\_birth} \\
+    Narrative text & summary, race report, biography, team history & full text
+    analysis \\
+    Names & title, winner, drivers, teams, circuit & ignores case and accents \\
+    Categories & document type, country, nationality & exact value \\
+    Numbers & season, wins, starters & exact value or range \\
+    Dates & race date, date of birth & exact date or range \\
     \bottomrule
   \end{tabular}
-  \caption{Indexed field types}
+  \caption{Kinds of indexed fields}
   \label{tab:schema}
 \end{table}
 
-Narrative text is stemmed so that different word forms match, while names
-are not, because stemming would distort them. ASCII folding keeps both the
-original and the folded token, so a query without diacritics still finds the
-name. The same analysis is applied at index and query time. For example,
-\textit{``Räikkönen's crashing in the rain''} produces the tokens
-\texttt{raikkonen}, \texttt{räikkönen}, \texttt{crash} and \texttt{rain}.
-The \texttt{all\_text} field is a copy of the title and all Wikipedia
-sections, used only by the baseline. Date range fields accept the dates in
-the format found in the data, such as \texttt{1950-05-13}, and still support
-range filters.
+\subsection{Text Analysis}
+\label{sec:analysis}
+Before being indexed, text goes through an analyzer: a tokenizer splits it
+into words, and a sequence of filters then transforms those words. Narrative
+text goes through the following steps:
+
+\begin{itemize}
+  \item \textbf{Tokenization} splits the text at spaces and punctuation.
+  \item \textbf{Possessive removal} turns ``Senna's'' into ``Senna''.
+  \item \textbf{Accent folding} adds a version without accents, so that
+  ``Raikkonen'' also finds ``Räikkönen''.
+  \item \textbf{Lowercasing} makes searches independent of case.
+  \item \textbf{Stop word removal} discards very common English words such as
+  ``the'' or ``in'', which carry little meaning and make up 45\% of all the
+  tokens in the collection.
+  \item \textbf{Stemming} reduces words to a common root with the Porter
+  algorithm, so that ``crashed'' and ``crashing'' match each other.
+\end{itemize}
+
+For example, the sentence \textit{``Räikkönen's crashing in the rain''} is
+reduced to the terms \textit{raikkonen}, \textit{räikkönen}, \textit{crash}
+and \textit{rain}. The same steps are applied to the queries, so that both
+sides end up in the same form. Names only go through tokenization, accent
+folding and lowercasing, because removing word endings could change a name
+and stop words can be part of one.
+
+We did not add a list of synonyms. Words that describe the same idea, such as
+``undercut'' and ``two-stop strategy'', are included by hand in the query of
+each need, and handling them automatically is left for the final system.
 
 \subsection{Retrieval Setups}
 \label{sec:setups}
-Both setups use the eDisMax query parser and the same query text for each
-information need. They return the top 10 documents ordered only by relevance
-score, which is never replaced by another sort order. Table~\ref{tab:setups}
-shows how they differ.
+We compare two setups. Both use eDisMax, the Solr query parser designed for
+free text, and both run the same query for each information need. A query
+lists the main words of the need and their common variants: for N4 it contains
+\textit{teammates}, \textit{team-mate}, \textit{collided}, \textit{collision},
+\textit{crashed} and \textit{together}. A document does not need to contain all
+of them to be returned, and documents are always ordered by relevance alone.
+Table~\ref{tab:setups} describes the parameters that were used.
 
 \begin{table}[ht]
   \small
-  \begin{tabular}{p{1.4cm}p{1.6cm}p{4.1cm}}
+  \begin{tabular}{p{0.6cm}p{3cm}p{1.3cm}p{1.85cm}}
     \toprule
-    & Baseline & Boosted \\
+    Name & Meaning & Baseline & Boosted \\
     \midrule
-    Search fields (\texttt{qf}) & \texttt{all\_text} &
-    weight 3: \texttt{summary}; weight 2: \texttt{title},
-    \texttt{qualifying}, \texttt{race}, \texttt{post\_race},
-    \texttt{biography}, \texttt{history}; weight 1: \texttt{background},
-    \texttt{other}, \texttt{layout}, \texttt{events}, \texttt{teams},
-    \texttt{drivers} \\
-    Phrase boost (\texttt{pf}, \texttt{ps}) & None &
-    weight 4: \texttt{summary}; weight 3: \texttt{race},
-    \texttt{biography}, \texttt{history}; weight 2: \texttt{qualifying},
-    \texttt{post\_race}; slop 3 \\
-    Filter (\texttt{fq}) & None & \texttt{type} of the need \\
+    \texttt{q} & Words to search for & same & same \\
+    \texttt{qf} & Fields to search and their weights & one field & several
+    (Table~\ref{tab:weights}) \\
+    \texttt{pf2} & Bonus when pairs of query words appear close together & not
+    used & several (Table~\ref{tab:weights}) \\
+    \texttt{ps2} & Maximum distance between words for that bonus & not used & 3
+    positions \\
+    \texttt{fq} & Restricts the results without changing their score & not
+    used & type of the need \\
     \bottomrule
   \end{tabular}
-  \caption{Retrieval setups}
+  \caption{Query parameters of each setup}
   \label{tab:setups}
 \end{table}
 
-The boosted setup gives the highest weight to \texttt{summary}, which
-concentrates the main facts of an article, and more weight to the sections
-that narrate what happened than to background material. The \texttt{teams}
-and \texttt{drivers} fields are included because a race text often names two
-drivers without saying that they are teammates, as in N4. Weights were set
-manually while exploring the queries in the Solr interface.
+The \textbf{baseline} represents a minimal configuration. The title and all
+Wikipedia sections are copied into a single field, so a word counts the same
+wherever it appears, and the search covers the whole collection.
+
+The \textbf{boosted} setup uses what we know about the structure of the
+documents (Table~\ref{tab:weights}). The summary has the highest weight, since
+it concentrates the main facts of an article, and the sections that narrate
+what happened count more than background information. Documents receive a
+bonus when consecutive words of the query appear close together, such as
+\textit{crashed} and \textit{together} in N4. We apply this bonus to pairs of
+words because our queries are lists of keywords: a bonus that required all of
+them to appear together had no effect on any need. Results are restricted to
+the document type requested by each need. The lists of teams and
+drivers are also searched because a race text often names two drivers without
+saying that they are teammates, as in N4. The weights were chosen manually
+while testing queries, and the same configuration is used for every need.
+
+\begin{table}[ht]
+  \small
+  \begin{tabular}{lcc}
+    \toprule
+    Field & Word weight & Word pair weight \\
+    \midrule
+    Summary & 3 & 4 \\
+    Race report, biography, history & 2 & 3 \\
+    Qualifying, post-race & 2 & 2 \\
+    Title & 2 & -- \\
+    Other text sections, teams, drivers & 1 & -- \\
+    \bottomrule
+  \end{tabular}
+  \caption{Field weights in the boosted setup}
+  \label{tab:weights}
+\end{table}
 
 \subsection{Demonstration}
 \label{sec:demo}
-Besides the Solr interface, a small web application lets a user type a
-query, restrict it to a document type and switch between the two setups.
+The indexing process is run by the script mentioned above, after which all
+2058 documents can be searched. Queries can be tested in the Solr interface,
+which shows every parameter and how each score was computed, or in a small web
+application that we built, where a user types a query, chooses a document type
+and switches between the two setups.
 % TODO: add a screenshot of the web application
-For N3 we use the query
-\texttt{"safety car" deployed restart lead advantage lost}. The baseline
-matches 1422 documents and the boosted setup 984, because the filter leaves
-only races, and their top 10 lists have no document in common
-(Table~\ref{tab:demo}).
+
+As an example, for N3 (safety car periods that changed the result) we search
+for \textit{``safety car'' deployed restart lead advantage lost}. The baseline
+finds 1422 documents and the boosted setup finds 984, since it only considers
+races. Their top 10 lists have no document in common, and
+Table~\ref{tab:demo} shows the first three positions. The configuration alone
+therefore changes what the user sees on the first page. Which of the two lists
+is better can only be decided by judging the results.
 
 \begin{table}[ht]
   \small
@@ -576,11 +634,12 @@ and templates, and some links led to disambiguation pages. These were
 solved with batched and cached requests, a parser that keeps only the
 prose, and automatic link resolution.
 
-As future work, the collection will be indexed in Apache Solr~\cite{solr},
-comparing a single-field baseline with a setup that weights the most
-informative fields and filters by structured fields, both evaluated with
-precision at $k$ and mean average precision. The harder information needs
-will then serve to compare this word-based search with semantic search.
+For the final system, we plan to add semantic search with text embeddings,
+combined with BM25 in a hybrid ranking, and compare it with the current
+setups on the harder information needs, where the same idea is written in
+different ways. We will also explore synonyms and query expansion for racing
+vocabulary, and extend the web application with result snippets and filters
+over the structured fields, such as season and nationality.
 
 % =====================================================================
 \onecolumn

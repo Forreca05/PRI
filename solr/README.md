@@ -269,7 +269,7 @@ Tem duas partes:
 - **`systems`** — configurações do Solr a comparar. Neste momento:
   - `simple` (baseline): eDisMax num único campo, `all_text` (cópia de todos os campos de
     texto), sem pesos e sem filtro por tipo de documento (`"filter_type": false`);
-  - `boosted`: pesos por campo (`qf`), bónus de frase (`pf`, `ps`) e filtro por tipo.
+  - `boosted`: pesos por campo (`qf`), bónus para pares de palavras próximas (`pf2`, `ps2`) e filtro por tipo.
 - **`needs`** — as 13 necessidades, cada uma com o tipo de documento (que vira
   `fq=type:...`) e a query `q`.
 

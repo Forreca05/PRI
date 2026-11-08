@@ -26,14 +26,14 @@ resultado apareceu. Ambas usam os mesmos dados, e a app precisa do Solr ligado.
 
 1. Testar 3 ou 4 necessidades na app. Mudar queries só agora, antes de avaliar.
 2. Fazer commit e push, para o grupo avaliar as mesmas listas.
-3. Avaliar os 217 documentos: 1 ou 0 na coluna `relevant` de `solr/qrels/N*.csv`.
+3. Avaliar os 218 documentos: 1 ou 0 na coluna `relevant` de `solr/qrels/N*.csv`.
 
    | Pessoa | Necessidades | Documentos |
    |---|---|---|
-   | A | N2, N3, N5 | 53 |
-   | B | N1, N4, N7 | 52 |
-   | C | N8, N11, N13 | 53 |
-   | D | N6, N9, N10, N12 | 59 |
+   | A | N1, N11, N13 | 53 |
+   | B | N2, N3, N5 | 53 |
+   | C | N4, N7, N8 | 52 |
+   | D | N6, N9, N10, N12 | 60 |
 
    - Critérios em `docs/information_needs.md`.
    - Documento do tipo errado leva 0 (por exemplo, um piloto em N4, que pede corridas).
