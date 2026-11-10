@@ -1,10 +1,11 @@
 \documentclass[sigconf]{acmart}
 \usepackage{float}
 \usepackage{multicol}
+\usepackage{longtable}
 \captionsetup[table]{position=bottom}
 
 \setcopyright{none}
-\acmConference[G67]{PRI}{October 2026}{Porto, Portugal}
+\acmConference[G67]{PRI}{November 2026}{Porto, Portugal}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \acmYear{2026}
 \acmDOI{}
@@ -46,7 +47,21 @@
 
 \renewcommand{\abstractname}{ABSTRACT}
 \begin{abstract}
-  Formula One history is divided between structured data, such as results and standings, and narrative text, such as race reports and driver biographies. We present Gridly, a search system that combines Jolpica F1 with English Wikipedia. A reproducible pipeline collects, cleans and links both sources into a document collection, which we characterize and use to define information needs for evaluating future search approaches.
+  Formula One history is divided between structured data, such as results
+  and standings, and narrative text, such as race reports and driver
+  biographies. We present Gridly, a search system that brings both together
+  by combining the Jolpica F1 database with English Wikipedia. A
+  reproducible pipeline collects, cleans and links the two sources into a
+  collection of 2058 documents about races, drivers, teams and circuits,
+  which we characterize. The collection is indexed in Apache Solr, with a
+  different text analysis for narrative text, names and categories, and can
+  be searched through a web application. We compare a baseline that
+  searches all the text as a single field with a setup that weights the
+  sections of each document and filters by document type, on thirteen
+  information needs whose results were judged by hand.
+  % TODO: add one sentence with the main result, e.g. "The boosted setup
+  % raises the MAP from X to Y, but needs whose idea is written in varied
+  % words remain hard for a search based only on words."
 \end{abstract}
 
 
@@ -64,7 +79,7 @@
 
 \keywords{Formula One, Motorsport, Information Retrieval, Search System,
   Wikipedia, Jolpica F1, Data Preparation, Data Quality, Conceptual Model,
-  Collection Characterization}
+  Collection Characterization, Apache Solr, BM25, Evaluation}
 
 \maketitle
 
@@ -95,11 +110,20 @@ purpose of an information retrieval system \cite{manning2008}, and it
 makes Formula One a good domain for one close to a real-world scenario.
 
 In this project, we present Gridly, a search system that integrates both
-types of information. The remainder of this paper is organized as
-follows: Section~\ref{sec:dataset} describes the dataset, including its sources,
-preparation, quality, structure, and characterization. Section~\ref{sec:needs}
-presents the search scenarios, and Section~\ref{sec:conclusions} concludes and outlines
-future work.
+types of information. We build a collection in which each race, driver,
+team and circuit is one document that joins its structured fields from
+Jolpica F1 with its text from Wikipedia, index it in Apache
+Solr~\cite{solr}, and evaluate how well two retrieval setups answer
+questions that depend on the text, such as the one above.
+
+The remainder of this paper is organized as follows.
+Section~\ref{sec:dataset} describes the dataset, including its sources,
+preparation, quality, structure and characterization.
+Section~\ref{sec:needs} presents the search scenarios used to evaluate the
+system. Section~\ref{sec:ir} explains how the documents are indexed and
+searched and the two setups we compare, and Section~\ref{sec:evaluation}
+evaluates them. Finally, Section~\ref{sec:conclusions} concludes and
+outlines future work.
 
 % =====================================================================
 \section{DATASET}
@@ -623,6 +647,217 @@ is better can only be decided by judging the results.
 \end{table}
 
 % =====================================================================
+\section{EVALUATION}
+\label{sec:evaluation}
+We evaluate both setups on the thirteen information needs of
+Table~\ref{tab:needs}. For each need, we wrote down beforehand what makes a
+document relevant and what does not, so that every judgement follows the
+same rule. Appendix~\ref{sec:criteria} lists these criteria together with
+the query and filter of each need, and Section~\ref{sec:detailed} describes
+the four hardest needs in more detail. For example, a race is relevant to N1 only
+if the text says that the strategy decided who won; a race that only mentions
+routine pit stops, or where the strategy changed positions outside the fight
+for the victory, is not.
+
+\textbf{Judgements.} Each setup returns its top 10 documents for every need.
+The two lists are merged without duplicates, which gives between 15 and 20
+documents per need, and each document is judged by hand as relevant (1) or
+not relevant (0). To decide, we read an excerpt of the document in which the
+query words are highlighted and, when that is not enough, the full article.
+The relevant documents of a need are those judged relevant in this merged
+list, so recall is measured relative to it and not to the whole collection.
+
+\textbf{Metrics.} For each need and setup we compute precision at 10 (P@10),
+the share of relevant documents in the first page of results, and average
+precision (AP), which also rewards placing the relevant documents near the
+top. The mean of the AP values over all needs (MAP) gives a single number per
+setup. We also plot the interpolated precision at eleven recall levels,
+averaged over all needs (Figure~\ref{fig:pr}).
+
+% TODO: run solr/search.py and solr/evaluate.py after judging every
+% solr/qrels/N*.csv file, then replace the "--" values below.
+\begin{table}[ht]
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+    & \multicolumn{2}{c}{Baseline} & \multicolumn{2}{c}{Boosted} \\
+    Need & P@10 & AP & P@10 & AP \\
+    \midrule
+    N1 & -- & -- & -- & -- \\
+    N2 & -- & -- & -- & -- \\
+    N3 & -- & -- & -- & -- \\
+    N4 & -- & -- & -- & -- \\
+    N5 & -- & -- & -- & -- \\
+    N6 & -- & -- & -- & -- \\
+    N7 & -- & -- & -- & -- \\
+    N8 & -- & -- & -- & -- \\
+    N9 & -- & -- & -- & -- \\
+    N10 & -- & -- & -- & -- \\
+    N11 & -- & -- & -- & -- \\
+    N12 & -- & -- & -- & -- \\
+    N13 & -- & -- & -- & -- \\
+    \midrule
+    MAP & & -- & & -- \\
+    \bottomrule
+  \end{tabular}
+  \caption{Results of each setup}
+  \label{tab:results}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\linewidth]{imgs/precision_recall.png}
+  \caption{Interpolated precision-recall curve of each setup}
+  \Description{Line chart of interpolated precision against recall, from 0
+  to 1, with one line for the baseline and one for the boosted setup.}
+  \label{fig:pr}
+\end{figure}
+
+% TODO: write the discussion once the numbers are in. Points to check:
+% - Does boosted beat the baseline in MAP? On which needs is the gap largest?
+% - Baseline has no type filter: how many of its top 10 are the wrong type
+%   (e.g. driver biographies returned for a race need)?
+% - Hard needs from Section "Search scenarios": N1 (varied vocabulary),
+%   N4 (teammates not named as such), N7 (few documents use the query words),
+%   N10 ("banned" returns the general turbo ban). Did they score lowest?
+% - One concrete example of a false positive, such as "shock absorber" for
+%   "shock" in N2.
+
+\subsection{Detailed Information Needs}
+\label{sec:detailed}
+The four needs below are described in more detail because they are the
+hardest to satisfy with a search based on words
+(Section~\ref{sec:needs}); the criteria of the other needs are in
+Appendix~\ref{sec:criteria}. For each one we give the full list of
+parameters sent to Solr by the boosted setup. Three of them are the same for
+every need:
+\begin{itemize}
+  \item \texttt{qf}: \texttt{title\^{}2 summary\^{}3 background
+  qualifying\^{}2 race\^{}2 post\_race\^{}2 other biography\^{}2
+  history\^{}2 layout events teams drivers}
+  \item \texttt{pf2}: \texttt{summary\^{}4 qualifying\^{}2 race\^{}3
+  post\_race\^{}2 biography\^{}3 history\^{}3}
+  \item \texttt{ps2}: \texttt{3}
+\end{itemize}
+The baseline sends the same \texttt{q}, \texttt{q.op}, \texttt{fl},
+\texttt{rows} and \texttt{sort}, but with \texttt{qf=all\_text}, without
+\texttt{pf2} and \texttt{ps2}, and without \texttt{fq}, so it searches the
+whole collection.
+
+\paragraph{N1: Races decided by a pit-stop or tyre strategy.}
+\textit{Relevance judgement.} The goal is to find Formula One races whose winner was decided by the
+strategy of the teams: the number of pit stops, the lap on which a driver
+stopped, the choice of tyres, an undercut or overcut, or a gamble on
+stopping fewer times than the rivals. Since almost every modern race report
+describes pit stops, a race is not relevant when the stops were routine, or
+when the strategy only changed positions outside the fight for the victory.
+The 2019 Hungarian Grand Prix, won by Hamilton after switching to a two-stop
+strategy to pass Verstappen in the last laps, is relevant.
+
+\textit{Search.} The query combines the general terms (\textit{pit stop},
+\textit{strategy}, \textit{tyres}) with the specific forms in which the idea
+is written (\textit{undercut}, \textit{two-stop}, \textit{one-stop},
+\textit{gamble}), since no single word covers every case. Results are
+restricted to races and ordered by score, so races in which several of these
+words appear in the summary or close together in the race report come
+first.
+
+\textit{Query.}
+\begin{itemize}
+  \item \texttt{defType}: \texttt{edismax}
+  \item \texttt{q}: \texttt{"pit stop" strategy undercut tyres "two-stop" "one-stop" gamble}
+  \item \texttt{q.op}: \texttt{OR}
+  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
+  \item \texttt{fq}: \texttt{type:race}
+  \item \texttt{fl}: \texttt{id, title, score}
+  \item \texttt{rows}: \texttt{10}
+  \item \texttt{sort}: \texttt{score desc}
+\end{itemize}
+
+\paragraph{N7: Drivers who returned after a serious injury.}
+\textit{Relevance judgement.} The goal is to find Formula One drivers whose biography describes a
+serious injury that interrupted their career for some time \textbf{and}
+their later return to racing, as with Niki Lauda after his burns in 1976.
+Injuries that did not stop the career, injuries that ended it and fatal
+accidents are not relevant, even though their biographies use many of the
+same words.
+
+\textit{Search.} The query covers both halves of the need: the injury
+(\textit{serious}, \textit{injury}, \textit{injured}, \textit{hospital},
+\textit{burns}) and the return (\textit{recovered}, \textit{returned},
+\textit{comeback}). Results are restricted to drivers, and biographies where
+the two halves appear close together receive the word-pair bonus. The query
+cannot tell an injury followed by a return from one followed by retirement
+or death, which is why this need is hard.
+
+\textit{Query.}
+\begin{itemize}
+  \item \texttt{defType}: \texttt{edismax}
+  \item \texttt{q}: \texttt{serious injury injured recovered returned comeback hospital burns}
+  \item \texttt{q.op}: \texttt{OR}
+  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
+  \item \texttt{fq}: \texttt{type:driver}
+  \item \texttt{fl}: \texttt{id, title, score}
+  \item \texttt{rows}: \texttt{10}
+  \item \texttt{sort}: \texttt{score desc}
+\end{itemize}
+
+\paragraph{N10: Technical innovations that were later banned.}
+\textit{Relevance judgement.} The goal is to find Formula One teams that created or pioneered a
+specific technical solution that the regulations later banned, such as a fan
+car or a six-wheeled car. A ban that applied to every team in the same way
+without being aimed at an innovation of that team, such as the end of turbo
+engines in 1989, is not relevant, and neither is an innovation that was
+never banned.
+
+\textit{Search.} The query joins the idea of a new solution (\textit{innovation}) with the
+words for a ban (\textit{banned}, \textit{outlawed}, \textit{prohibited}),
+and adds the names of the best-known banned solutions (\textit{fan car},
+\textit{six-wheeled}, \textit{ground effect}) as phrases. Results are
+restricted to teams. The word \textit{banned} also appears in the history of
+many teams because of the turbo ban, so documents that only mention that
+general ban can still rank high.
+
+\textit{Query.}
+\begin{itemize}
+  \item \texttt{defType}: \texttt{edismax}
+  \item \texttt{q}: \texttt{innovation banned outlawed prohibited "fan car" "six-wheeled" "ground effect"}
+  \item \texttt{q.op}: \texttt{OR}
+  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
+  \item \texttt{fq}: \texttt{type:team}
+  \item \texttt{fl}: \texttt{id, title, score}
+  \item \texttt{rows}: \texttt{10}
+  \item \texttt{sort}: \texttt{score desc}
+\end{itemize}
+
+\paragraph{N13: Circuits that drivers boycotted or considered too dangerous.}
+\textit{Relevance judgement.} The goal is to find Formula One circuits that drivers or teams boycotted
+or refused to race at for safety reasons, or that were described as too
+dangerous. Boycotts for political or contractual reasons are not relevant,
+and neither are circuits where accidents happened without any criticism of
+the safety of the track itself.
+
+\textit{Search.} The query includes the actions of the drivers (\textit{boycott},
+\textit{boycotted}, \textit{refused}, \textit{protest}, \textit{criticized})
+and the judgement of the track (\textit{dangerous}, \textit{unsafe},
+\textit{safety concerns}). Results are restricted to circuits. Words such as
+\textit{dangerous} and \textit{drivers} also appear in plain descriptions of
+accidents, and \textit{boycott} in political disputes, so some circuits match
+without being relevant.
+
+\textit{Query.}
+\begin{itemize}
+  \item \texttt{defType}: \texttt{edismax}
+  \item \texttt{q}: \texttt{boycott boycotted refused dangerous unsafe "safety concerns" protest criticized drivers}
+  \item \texttt{q.op}: \texttt{OR}
+  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
+  \item \texttt{fq}: \texttt{type:circuit}
+  \item \texttt{fl}: \texttt{id, title, score}
+  \item \texttt{rows}: \texttt{10}
+  \item \texttt{sort}: \texttt{score desc}
+\end{itemize}
+
+% =====================================================================
 \section{CONCLUSION AND FUTURE WORK}
 \label{sec:conclusions}
 We built a reproducible collection of 2058 Formula One documents,
@@ -692,6 +927,83 @@ cut with ``\ldots''.
 \end{verbatim}
 }
 \end{multicols}
+
+\section{Relevance Criteria and Queries}
+\label{sec:criteria}
+Relevance criteria and query of each information need. The query \texttt{q}
+is the same in both setups and is parsed by eDisMax with the default
+operator \texttt{OR}, so a document does not need to contain every word. The
+boosted setup also applies the filter \texttt{fq=type:<type>} and the field
+weights of Table~\ref{tab:weights}; the baseline searches every document in
+the \texttt{all\_text} field. Results are sorted by score, and the top 10 are
+judged.
+
+{\small
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{p{0.6cm}p{1.2cm}p{5.6cm}p{5.2cm}p{4.2cm}}
+  \toprule
+  ID & Type & Relevant & Not relevant & Query \texttt{q} \\
+  \midrule
+  \endhead
+  N1 & race & The text says the pit-stop or tyre strategy (number or timing of
+  stops, tyre choice, an undercut) was decisive for who won. & Routine pit
+  stops only, or a strategy that changed positions outside the fight for the
+  victory. & \texttt{"pit stop" strategy undercut tyres "two-stop" "one-stop"
+  gamble} \\
+  N2 & race & Rain or wet conditions are mentioned \textbf{and} the result is
+  described as unusual (first win, small team, very few finishers). & A wet
+  race won by the favorite, or a surprising result unrelated to the weather.
+  & \texttt{rain wet surprise shock unexpected "first win" "only three"} \\
+  N3 & race & The safety car clearly affected the final order or the fight
+  for the victory, or its use was controversial. & The safety car is only
+  mentioned in passing, with no effect on the result. & \texttt{"safety car"
+  deployed restart lead advantage lost} \\
+  N4 & race & A collision or contact between two drivers of the same team
+  during the race. & Collisions between drivers of different teams; near
+  misses. & \texttt{teammates "team-mate" collided collision crashed
+  together} \\
+  N5 & race & A death during the Grand Prix weekend (practice, qualifying or
+  race). & Deaths at other events mentioned only as context; serious
+  accidents without fatalities. & \texttt{fatal accident killed died death}
+  \\
+  N6 & race & A disqualification or exclusion from the race or qualifying for
+  a \textbf{technical} reason. & Disqualifications for behavior (ignoring a
+  black flag, pushing the car) or time penalties. & \texttt{disqualified
+  disqualification illegal underweight technical infringement excluded} \\
+  N7 & driver & The biography describes a serious injury that interrupted the
+  career \textbf{and} a return to racing. & Injuries without a break in the
+  career; injuries that ended it; fatal accidents. & \texttt{serious injury
+  injured recovered returned comeback hospital burns} \\
+  N8 & driver & The biography mentions a win or a notable result at Le Mans
+  or the Indianapolis 500. & Participation without a notable result; Le Mans
+  mentioned for other reasons, such as the 1955 disaster. & \texttt{"Le Mans"
+  Indianapolis "Indy 500" won victory} \\
+  N9 & team & The team history describes a withdrawal or collapse caused by
+  financial difficulties. & Teams sold or renamed without a financial crisis;
+  financial problems the team overcame. & \texttt{financial bankrupt
+  bankruptcy debts administration collapsed funding liquidation} \\
+  N10 & team & The team created or pioneered a technical solution that was
+  later banned. & General bans that affected every team equally, such as the
+  end of turbo engines in 1989; innovations never banned. &
+  \texttt{innovation banned outlawed prohibited "fan car" "six-wheeled"
+  "ground effect"} \\
+  N11 & team & The team changed its name after being sold, or was acquired by
+  another company or owner. & Changes of sponsor or engine only; teams that
+  simply closed. & \texttt{renamed rebranded "taken over" takeover bought
+  purchased acquired sold} \\
+  N12 & circuit & The text links a change to the layout (a chicane, a
+  redesigned corner, a shorter track) to a serious accident. & Accidents
+  without a layout change; changes for commercial or length reasons. &
+  \texttt{accident crash fatal death chicane redesigned modified safety
+  layout changed altered} \\
+  N13 & circuit & Drivers or teams boycotted or refused to race at the circuit
+  for safety reasons, or considered it too dangerous. & Political or
+  contractual boycotts; accidents mentioned without criticism of the
+  circuit's safety. & \texttt{boycott boycotted refused dangerous unsafe
+  "safety concerns" protest criticized drivers} \\
+  \bottomrule
+\end{longtable}
+}
 
 \section{Additional Figures}
 
@@ -771,7 +1083,7 @@ cut with ``\ldots''.
 \end{figure}
 
 \clearpage
-\section{Domain Conceptual Domain}
+\section{Domain Conceptual Model}
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,

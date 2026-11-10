@@ -102,14 +102,14 @@ h1 span { color: var(--lime); }
 .search-panel > button:hover { background: #d93442; }
 .search-panel > button span { margin-left: 9px; }
 .filters {
-  position: absolute;
-  top: 79px;
-  left: 0;
   display: flex;
-  gap: 22px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 22px;
+  margin-top: 14px;
 }
-.filters label { color: #8290a4; }
-.filters select {
+.filters label { display: flex; align-items: center; color: #8290a4; }
+.filters select, .filters .year {
   margin-left: 7px;
   padding: 5px 7px;
   border: 1px solid #293447;
@@ -118,13 +118,21 @@ h1 span { color: var(--lime); }
   background: #151d2b;
   font: 12px "DM Sans", sans-serif;
 }
+.filters .year { width: 66px; }
+.filters .year + .dash { margin: 0 6px; color: #647187; }
+.filters .year + .dash + .year { margin-left: 0; }
+.filters select:disabled { opacity: .45; }
+.filters .toggle { gap: 7px; cursor: pointer; }
+.filters .toggle input { accent-color: var(--red); width: 14px; height: 14px; margin: 0; }
 .quick-searches {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 40px;
+  margin-top: 34px;
 }
+.quick-searches > span { width: 100%; margin-bottom: 4px; }
+.quick-searches .need-id { color: var(--red); font: 500 10px "DM Mono", monospace; }
 .quick-searches > span { margin-right: 4px; color: #758399; }
 .quick-searches button {
   padding: 7px 11px;
@@ -136,7 +144,38 @@ h1 span { color: var(--lime); }
   cursor: pointer;
 }
 .quick-searches button:hover { border-color: var(--lime); color: var(--lime); }
-.results-section { max-width: 760px; margin: 86px auto 0; }
+.results-section { max-width: 760px; margin: 64px auto 0; }
+.results-section:has(.compare) { max-width: 1100px; }
+.correction { margin: 0 0 16px; color: #bbc5d3; font-size: 14px; }
+.correction strong { color: var(--lime); }
+.correction .link {
+  padding: 0;
+  border: 0;
+  color: #aab6c7;
+  background: none;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.correction .link:hover { color: var(--text); }
+.type-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.type-chip {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: #aab6c7;
+  background: transparent;
+  font: 12px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.type-chip .count { color: #647187; font: 11px "DM Mono", monospace; }
+.type-chip:hover:not(:disabled) { border-color: var(--lime); color: var(--lime); }
+.type-chip.active { border-color: var(--red); color: var(--text); background: #f044521a; }
+.type-chip.active .count { color: var(--red); }
+.type-chip:disabled { opacity: .35; cursor: default; }
 .results-heading {
   margin-bottom: 15px;
   color: #bbc5d3;
@@ -166,8 +205,31 @@ h1 span { color: var(--lime); }
 .result-card h2 { margin: 11px 0 7px; font: 600 20px "Space Grotesk", sans-serif; }
 .result-card h2 a { color: var(--text); text-decoration: none; }
 .result-card h2 a:hover { color: var(--lime); }
+.result-card h2 a:not([href]) { cursor: default; }
 .metadata { display: flex; flex-wrap: wrap; gap: 7px 14px; color: var(--lime); font-size: 11px; }
 .result-card p { margin: 12px 0 0; color: #a9b5c6; font-size: 13px; line-height: 1.65; }
+.snippet mark {
+  padding: 0 2px;
+  border-radius: 2px;
+  color: #171d28;
+  background: var(--lime);
+}
+.rank { color: #647187; font: 500 11px "DM Mono", monospace; }
+.badge.both { border-color: var(--lime); color: var(--lime); }
+.result-card.shared { border-color: #d3f36b55; }
+.results.compare { grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.compare-column { display: grid; gap: 12px; min-width: 0; }
+.compare-column h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--red);
+  font: 600 18px "Space Grotesk", sans-serif;
+}
+.compare-column:first-child h3 { border-color: #47556a; }
+.compare-column .found { color: #738198; font: 10px "DM Mono", monospace; letter-spacing: .1em; }
 .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; color: #aab6c7; font-size: 12px; }
 .pagination button {
   padding: 9px 12px;
@@ -196,7 +258,8 @@ footer {
   .search-panel > button { padding: 0 12px; }
   .search-icon { padding-left: 4px; }
   #query { font-size: 13px; }
-  .filters { position: static; width: 100%; padding: 12px 4px 2px; gap: 10px; flex-wrap: wrap; }
+  .filters { gap: 10px 16px; }
+  .results.compare { grid-template-columns: 1fr; }
   .quick-searches { margin-top: 22px; }
   .results-section { margin-top: 62px; }
   .collection-status { font-size: 8px; }

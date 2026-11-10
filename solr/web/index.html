@@ -3,15 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#0c111b">
   <title>GRIDLY</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1">
-  <link rel="stylesheet" href="/styles.css?v=2">
-  <script src="/app.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="/styles.css?v=4">
+  <script src="/app.js?v=5" defer></script>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="/" aria-label="F1 Search home"><span class="brand-mark">F1</span> GRIDLY</a>
+    <a class="brand" href="/" aria-label="Gridly home"><span class="brand-mark">F1</span> GRIDLY</a>
+    <span class="collection-status"><span class="status-dot"></span>2,058 DOCUMENTS · 1950–2026</span>
   </header>
 
   <main>
@@ -26,27 +30,42 @@
         <input id="query" name="q" type="search" placeholder="What would you like to know about F1?"
                autocomplete="off" required>
         <button type="submit">Search <span aria-hidden="true">→</span></button>
-        <div class="filters">
-          <label>TYPE
-            <select id="type">
-              <option value="all">Everything</option>
-              <option value="race">Races</option>
-              <option value="driver">Drivers</option>
-              <option value="team">Teams</option>
-              <option value="circuit">Circuits</option>
-            </select>
-          </label>
-          <label>RANKING
-            <select id="system">
-              <option value="boosted">Relevance (boosted)</option>
-              <option value="simple">Simple</option>
-            </select>
-          </label>
-        </div>
       </form>
+
+      <div class="filters">
+        <label>TYPE
+          <select id="type">
+            <option value="all">Everything</option>
+            <option value="race">Races</option>
+            <option value="driver">Drivers</option>
+            <option value="team">Teams</option>
+            <option value="circuit">Circuits</option>
+          </select>
+        </label>
+        <label>SEASONS
+          <input id="from" class="year" type="number" min="1950" max="2026" placeholder="1950" inputmode="numeric">
+          <span class="dash">–</span>
+          <input id="to" class="year" type="number" min="1950" max="2026" placeholder="2026" inputmode="numeric">
+        </label>
+        <label>RANKING
+          <select id="system">
+            <option value="boosted">Boosted</option>
+            <option value="simple">Baseline</option>
+          </select>
+        </label>
+        <label class="toggle">
+          <input id="compare" type="checkbox"> COMPARE BOTH
+        </label>
+      </div>
+
+      <div id="examples" class="quick-searches" hidden>
+        <span>TRY AN INFORMATION NEED</span>
+      </div>
     </section>
 
     <section class="results-section" aria-live="polite">
+      <p id="correction" class="correction" hidden></p>
+      <div id="type-counts" class="type-counts" hidden></div>
       <div id="results-heading" class="results-heading"></div>
       <p id="message" class="message">Search the archive to explore more than 2,000 F1 documents.</p>
       <div id="results" class="results"></div>
