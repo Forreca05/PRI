@@ -619,9 +619,23 @@ while testing queries, and the same configuration is used for every need.
 The indexing process is run by the script mentioned above, after which all
 2058 documents can be searched. Queries can be tested in the Solr interface,
 which shows every parameter and how each score was computed, or in a small web
-application that we built, where a user types a query, chooses a document type
-and switches between the two setups.
-% TODO: add a screenshot of the web application
+application that we built (Figure~\ref{fig:webapp}). There, a user types a
+query, restricts it by document type and range of seasons, and chooses one of
+the two setups or shows both side by side. Each result shows its main
+structured fields and an excerpt of the text with the query words
+highlighted, and the information needs of Table~\ref{tab:needs} can be run
+with a single click.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\linewidth]{imgs/webapp.png}
+  \caption{Search page of the web application}
+  \Description{Dark search page titled ``Searching the history of Formula 1''
+  with a search box, filters for document type, seasons and ranking setup, an
+  option to compare both setups, and buttons with the information needs N1 to
+  N13.}
+  \label{fig:webapp}
+\end{figure}
 
 As an example, for N3 (safety car periods that changed the result) we search
 for \textit{``safety car'' deployed restart lead advantage lost}. The baseline
@@ -873,8 +887,9 @@ For the final system, we plan to add semantic search with text embeddings,
 combined with BM25 in a hybrid ranking, and compare it with the current
 setups on the harder information needs, where the same idea is written in
 different ways. We will also explore synonyms and query expansion for racing
-vocabulary, and extend the web application with result snippets and filters
-over the structured fields, such as season and nationality.
+vocabulary, and extend the web application with more filters over the
+structured fields, such as nationality or team, and with links between
+related documents.
 
 % =====================================================================
 \onecolumn
