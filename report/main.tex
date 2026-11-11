@@ -58,10 +58,11 @@
   be searched through a web application. We compare a baseline that
   searches all the text as a single field with a setup that weights the
   sections of each document and filters by document type, on thirteen
-  information needs whose results were judged by hand.
-  % TODO: add one sentence with the main result, e.g. "The boosted setup
-  % raises the MAP from X to Y, but needs whose idea is written in varied
-  % words remain hard for a search based only on words."
+  information needs whose results were judged by hand. The weighted setup
+  raises the mean average precision from 0.35 to 0.57, mostly by excluding
+  documents of the wrong type and favoring the summary, but needs that depend
+  on a cause and its effect, such as a circuit changed after an accident,
+  remain hard for a search based only on words.
 \end{abstract}
 
 
@@ -498,24 +499,36 @@ Section~\ref{sec:model}.
 
 Not all fields should be searched in the same way. A race report is free text,
 a driver's name must not be altered, and a season is a number. We therefore
-grouped the fields into the five kinds shown in Table~\ref{tab:schema}. All
-fields are indexed except the Wikipedia URL, which is only displayed.
+grouped the 59 fields of the schema into the five kinds shown in
+Table~\ref{tab:schema}, each with its own Solr field type. Narrative text uses
+a type we defined, \texttt{f1\_text}, with the full analysis described in
+Section~\ref{sec:analysis}. Names use a second type of our own,
+\texttt{f1\_name}, which only ignores case and accents. Categories and
+identifiers, such as the document type or the list of driver identifiers of a
+race, are stored as \texttt{string} and only match their exact value. Numbers
+and dates use Solr's numeric and date range types, so they can be searched
+by range, such as the seasons from 1980 to 1989. All fields are indexed
+except the Wikipedia URL, which is only displayed. The title and the ten text
+sections are also copied into a single field, \texttt{all\_text}, which is
+used by the baseline (Section~\ref{sec:setups}).
 
 \begin{table}[ht]
   \small
-  \begin{tabular}{p{1.6cm}p{3.3cm}p{2.3cm}}
+  \begin{tabular}{p{1.5cm}p{1.9cm}p{0.35cm}p{3.6cm}}
     \toprule
-    Kind & Examples & Search behavior \\
+    Kind & Solr type & \# & Example fields \\
     \midrule
-    Narrative text & summary, race report, biography, team history & full text
-    analysis \\
-    Names & title, winner, drivers, teams, circuit & ignores case and accents \\
-    Categories & document type, country, nationality & exact value \\
-    Numbers & season, wins, starters & exact value or range \\
-    Dates & race date, date of birth & exact date or range \\
+    Narrative text & \texttt{f1\_text} & 11 & summary, race, biography,
+    history, \texttt{all\_text} \\
+    Names & \texttt{f1\_name} & 14 & title, winner, drivers, teams, circuit \\
+    Categories & \texttt{string} & 11 & type, country, nationality,
+    driver\_ids \\
+    Numbers & \texttt{pint}, \texttt{pdouble}, \texttt{plong} & 21 & season,
+    wins, starters, latitude \\
+    Dates & \texttt{DateRange} & 2 & date, date\_of\_birth \\
     \bottomrule
   \end{tabular}
-  \caption{Kinds of indexed fields}
+  \caption{Fields of the Solr schema, by kind}
   \label{tab:schema}
 \end{table}
 
@@ -547,7 +560,7 @@ and stop words can be part of one.
 
 We did not add a list of synonyms. Words that describe the same idea, such as
 ``undercut'' and ``two-stop strategy'', are included by hand in the query of
-each need, and handling them automatically is left for the final system.
+each need, and handling them automatically is left as future work.
 
 \subsection{Retrieval Setups}
 \label{sec:setups}
@@ -690,6 +703,11 @@ not relevant (0). To decide, we read an excerpt of the document in which the
 query words are highlighted and, when that is not enough, the full article.
 The relevant documents of a need are those judged relevant in this merged
 list, so recall is measured relative to it and not to the whole collection.
+This is a limitation: a relevant document that neither setup placed in its
+top 10 is never judged, so recall is overestimated for both setups, and
+a document found by only one setup counts as missed by the other. Judging
+the whole collection was not feasible, and since both setups are compared on
+the same pool, the comparison between them remains fair.
 
 \textbf{Metrics.} For each need and setup we compute precision at 10 (P@10),
 the share of relevant documents in the first page of results, and average
@@ -761,15 +779,43 @@ the boosted setup retrieves every relevant document in four needs and stays at
 to find, the boosted setup shows fewer non-relevant documents along the way,
 which agrees with its higher MAP.
 
-% TODO: write the discussion once the numbers are in. Points to check:
-% - Does boosted beat the baseline in MAP? On which needs is the gap largest?
-% - Baseline has no type filter: how many of its top 10 are the wrong type
-%   (e.g. driver biographies returned for a race need)?
-% - Hard needs from Section "Search scenarios": N1 (varied vocabulary),
-%   N4 (teammates not named as such), N7 (few documents use the query words),
-%   N10 ("banned" returns the general turbo ban). Did they score lowest?
-% - One concrete example of a false positive, such as "shock absorber" for
-%   "shock" in N2.
+\textbf{Discussion.} The boosted setup raises the MAP from 0.35 to 0.57 and
+the average P@10 from 0.48 to 0.66, and it has the higher AP in ten of the
+thirteen needs (Table~\ref{tab:results}). The largest gains are in N13 (from
+0.03 to 0.72), N2, N10 and N5, and a large part of them comes from the filter
+by document type. Of the 130 documents in the top 10 lists of the baseline,
+31 (24\%) are of the wrong type, and by our criteria these are never
+relevant: in N13, which asks for circuits, eight of the ten are race reports
+or biographies, such as the 1982 San Marino Grand Prix, which was
+\emph{boycotted} by many teams for political reasons; in N5, five are
+biographies of drivers killed in accidents, such as François Cevert; and in
+N10, four are biographies, such as that of Jim Hall, whose banned
+``vacuum cleaner'' car is described in his own article and not in that of a
+team. The field weights help in a different way. In N2 the baseline has no
+relevant document in its top 10, since it also matches the words of the
+query in the qualifying section: the 2023 Canadian Grand Prix is retrieved
+because rain fell during qualifying and a red flag came ``only three
+minutes'' after it began. The boosted setup gives more weight to the summary
+and the race report, where the result of the race is described.
+
+The baseline is better in N3, N8 and N12, and these, together with N7, are
+also the needs with the lowest AP in the boosted setup. In all of them
+relevance depends on a relation that the words of the query do not express:
+a safety car that \emph{changed} the result, a layout changed \emph{because
+of} an accident, a return \emph{after} an injury, or a \emph{success} at
+Indianapolis rather than a mere participation. The boosted setup ranks first
+documents that contain the words but not the relation. In N3, its first result
+is the 2026 Belgian Grand Prix, where the leader lost and regained the lead
+around a virtual safety car but still won; in N8 it ranks the biographies of
+drivers who only took part in the Indianapolis 500, such as Carl Scarborough,
+who died during the 1953 race; and in N12 it returns circuits whose chicanes
+were changed to increase overtaking. Words can also match in an unrelated
+sense: the 1967 Monaco Grand Prix is retrieved for N2 because its
+summary calls \emph{unexpected} a victory from four months earlier. Of the
+four needs we expected to be hard (Section~\ref{sec:needs}), N7 is among the
+weakest, while N1, N4 and N10 reached an AP between 0.54 and 0.69, thanks to
+queries with several variants of the same idea and, in N4, to phrases instead
+of single words.
 
 \subsection{Detailed Information Needs}
 \label{sec:detailed}
@@ -908,8 +954,18 @@ without being relevant.
 % =====================================================================
 \section{CONCLUSION AND FUTURE WORK}
 \label{sec:conclusions}
-We built a reproducible collection of 2058 Formula One documents,
-characterized it and defined thirteen information needs for our future work.
+We built a reproducible collection of 2058 Formula One documents that joins
+the results of Jolpica F1 with the text of Wikipedia, characterized it, and
+indexed it in Apache Solr with a different analysis for narrative text, names
+and categories. On thirteen information needs judged by hand, a setup that
+weights the sections of each document and filters by type raises the MAP from
+0.35 to 0.57 and the average P@10 from 0.48 to 0.66 over a baseline that
+searches all the text as one field. Most of the gain comes from removing
+documents of the wrong type and from favoring the summary, while queries made
+of short phrases improved the needs in which single words appear in almost
+every document. The needs that remain hard are those in which relevance
+depends on a relation between two facts, such as an accident and the change
+of layout that followed it, which a search based only on words cannot see.
 
 The most challenging part was turning Wikipedia into usable text: the API
 blocks one-request-per-page clients, the wikitext mixes prose with tables
@@ -917,13 +973,14 @@ and templates, and some links led to disambiguation pages. These were
 solved with batched and cached requests, a parser that keeps only the
 prose, and automatic link resolution.
 
-For the final system, we plan to add semantic search with text embeddings,
+As future work, we plan to add semantic search with text embeddings,
 combined with BM25 in a hybrid ranking, and compare it with the current
 setups on the harder information needs, where the same idea is written in
 different ways. We will also explore synonyms and query expansion for racing
 vocabulary, and extend the web application with more filters over the
 structured fields, such as nationality or team, and with links between
-related documents.
+related documents. Finally, we will judge longer result lists, so that recall
+is estimated over a larger pool of documents.
 
 % =====================================================================
 \onecolumn
