@@ -47,22 +47,19 @@
 
 \renewcommand{\abstractname}{ABSTRACT}
 \begin{abstract}
-  Formula One history is divided between structured data, such as results
-  and standings, and narrative text, such as race reports and driver
-  biographies. We present Gridly, a search system that brings both together
-  by combining the Jolpica F1 database with English Wikipedia. A
-  reproducible pipeline collects, cleans and links the two sources into a
-  collection of 2058 documents about races, drivers, teams and circuits,
-  which we characterize. The collection is indexed in Apache Solr, with a
-  different text analysis for narrative text, names and categories, and can
-  be searched through a web application. We compare a baseline that
-  searches all the text as a single field with a setup that weights the
-  sections of each document and filters by document type, on thirteen
-  information needs whose results were judged by hand. The weighted setup
-  raises the mean average precision from 0.35 to 0.57, mostly by excluding
-  documents of the wrong type and favoring the summary, but needs that depend
-  on a cause and its effect, such as a circuit changed after an accident,
-  remain hard for a search based only on words.
+  Formula One history is scattered across sources that are rarely used
+  together: results and standings are kept as structured data, while the
+  reasons behind them are told in free text. We build a search system that
+  unifies both, combining Jolpica F1 records with English Wikipedia articles,
+  linked through the article URLs stored by Jolpica. A reproducible pipeline
+  collects, cleans and links the sources into 2058 documents about races,
+  drivers, teams and circuits from 1950 to 2026, which are indexed in Apache
+  Solr with a separate analysis for free text and for names. We evaluate two
+  ranking setups on thirteen information needs. Weighting the sections of
+  each document and filtering by document type raises the mean average
+  precision from 0.35 to 0.57 over a single-field baseline, but needs that
+  depend on a cause and its effect, such as a circuit redesigned after an
+  accident, remain hard for a search based only on words.
 \end{abstract}
 
 
@@ -114,8 +111,8 @@ In this project, we present Gridly, a search system that integrates both
 types of information. We build a collection in which each race, driver,
 team and circuit is one document that joins its structured fields from
 Jolpica F1 with its text from Wikipedia, index it in Apache
-Solr~\cite{solr}, and evaluate how well two retrieval setups answer
-questions that depend on the text, such as the one above.
+Solr~\cite{solr}, and evaluate two retrieval setups on questions that need
+the text, such as finding the races decided by a late mechanical failure.
 
 The remainder of this paper is organized as follows.
 Section~\ref{sec:dataset} describes the dataset, including its sources,
@@ -274,7 +271,7 @@ threshold was chosen by inspecting these articles: raising it to 150 words would
 The final collection comprises 2058 documents of four types and 59 distinct
 fields, stored in a 22.1~MB JSON file (Table~\ref{tab:collection}). Each document combines structured fields from
 Jolpica, used for filters, with text fields from Wikipedia, which are the
-ones searched (Table~\ref{tab:fields}). All documents also keep the article
+main ones searched (Table~\ref{tab:fields}). All documents also keep the article
 URL, the revision identifier and their word count. An abridged example of a race
 document is shown in Appendix~\ref{sec:example}.
 
@@ -469,8 +466,8 @@ cars finished. A wet race won by the favorite is not relevant.
 
 We deliberately included some needs that are hard to satisfy. In N1, the same idea appears as
 ``undercut'', ``two-stop strategy'' or ``gambled on not needing a pit
-stop''; in N4, the text often gives only the two names, so the
-\texttt{teams} field is needed; N7 has few documents that use the words of
+stop''; in N4, the text often gives only the two names, without saying that
+they are teammates; N7 has few documents that use the words of
 the query, even though there are well-known cases such as Niki Lauda or
 Felipe Massa; and in N10, ``banned'' mostly returns the ban on turbo
 engines, which affected every team and is not relevant. These cases expose
@@ -482,7 +479,7 @@ the limits of a search based only on words.
 To search the collection we use Apache Solr~\cite{solr}, an open-source
 search platform. Solr receives the documents, organizes their content in an
 index that makes search fast, and answers each query with a list of documents
-ordered by relevance. This order is computed with BM25~\cite{manning2008},
+ordered by relevance. This order is computed with BM25~\cite{bm25},
 Solr's default ranking function. BM25 gives more weight to words that are rare
 in the collection and compensates for document length, which matters here
 because the length of our documents is very uneven
@@ -499,7 +496,7 @@ Section~\ref{sec:model}.
 
 Not all fields should be searched in the same way. A race report is free text,
 a driver's name must not be altered, and a season is a number. We therefore
-grouped the 59 fields of the schema into the five kinds shown in
+grouped the fields of the schema into the five kinds shown in
 Table~\ref{tab:schema}, each with its own Solr field type. Narrative text uses
 a type we defined, \texttt{f1\_text}, with the full analysis described in
 Section~\ref{sec:analysis}. Names use a second type of our own,
@@ -528,7 +525,8 @@ used by the baseline (Section~\ref{sec:setups}).
     Dates & \texttt{DateRange} & 2 & date, date\_of\_birth \\
     \bottomrule
   \end{tabular}
-  \caption{Fields of the Solr schema, by kind}
+  \caption{Fields of the Solr schema, by kind, without the document
+  identifier}
   \label{tab:schema}
 \end{table}
 
@@ -544,9 +542,11 @@ text goes through the following steps:
   \item \textbf{Accent folding} adds a version without accents, so that
   ``Raikkonen'' also finds ``Räikkönen''.
   \item \textbf{Lowercasing} makes searches independent of case.
-  \item \textbf{Stop word removal} discards very common English words such as
-  ``the'' or ``in'', which carry little meaning and make up 45\% of all the
-  tokens in the collection.
+  \item \textbf{Stop word removal} discards the 35 words of Solr's English
+  list, such as ``the'' or ``in'', which carry little meaning and make up
+  29\% of the tokens of the text fields. This list is much shorter than the
+  one used in Section~\ref{sec:characterization}, so words such as ``his'' or
+  ``after'' are kept.
   \item \textbf{Stemming} reduces words to a common root with the Porter
   algorithm, so that ``crashed'' and ``crashing'' match each other.
 \end{itemize}
@@ -564,8 +564,8 @@ each need, and handling them automatically is left as future work.
 
 \subsection{Retrieval Setups}
 \label{sec:setups}
-We compare two setups. Both use eDisMax, the Solr query parser designed for
-free text, and both run the same query for each information need. A query
+We compare two setups. Both use eDisMax~\cite{edismax}, the Solr query
+parser designed for free text, and both run the same query for each information need. A query
 usually lists the main words of the need and their common variants: for N1 it
 contains \textit{undercut}, \textit{``two-stop''} and \textit{gamble}, among
 others. In N3 and N4 single words were not enough, since almost every race
@@ -612,8 +612,9 @@ bonus when consecutive words of the query appear close together, such as
 words because most of our queries are lists of keywords: a bonus that required
 all of them to appear together had no effect on any need. Results are restricted to
 the document type requested by each need. The lists of teams and
-drivers are also searched because a race text often names two drivers without
-saying that they are teammates, as in N4. The weights were chosen manually
+drivers are also searched, with a low weight, so that a query with the name
+of a driver or a team also finds the races in which they took part. The
+weights were chosen manually
 while testing queries, and the same configuration is used for every need.
 
 \begin{table}[ht]
@@ -635,8 +636,8 @@ while testing queries, and the same configuration is used for every need.
 
 \subsection{Demonstration}
 \label{sec:demo}
-The indexing process is run by the script mentioned above, after which all
-2058 documents can be searched. Queries can be tested in the Solr interface,
+Once the script mentioned above has run, all 2058 documents can be
+searched. Queries can be tested in the Solr interface,
 which shows every parameter and how each score was computed, or in a small web
 application that we built (Figure~\ref{fig:webapp}). There, a user types a
 query, restricts it by document type and range of seasons, and chooses one of
@@ -691,13 +692,13 @@ Table~\ref{tab:needs}. For each need, we wrote down beforehand what makes a
 document relevant and what does not, so that every judgement follows the
 same rule. Appendix~\ref{sec:criteria} lists these criteria together with
 the query and filter of each need, and Section~\ref{sec:detailed} describes
-the four hardest needs in more detail. For example, a race is relevant to N1 only
+one need of each document type in more detail. For example, a race is relevant to N1 only
 if the text says that the strategy decided who won; a race that only mentions
 routine pit stops, or where the strategy changed positions outside the fight
 for the victory, is not.
 
 \textbf{Judgements.} Each setup returns its top 10 documents for every need.
-The two lists are merged without duplicates, which gives between 13 and 20
+The two lists are merged without duplicates, which gives between 13 and 18
 documents per need, and each document is judged by hand as relevant (1) or
 not relevant (0). To decide, we read an excerpt of the document in which the
 query words are highlighted and, when that is not enough, the full article.
@@ -746,6 +747,18 @@ averaged over all needs (Figure~\ref{fig:pr}).
 
 \begin{figure}[ht]
   \centering
+  \includegraphics[width=\linewidth]{imgs/ap_per_need.png}
+  \caption{Average precision of each need in each setup}
+  \Description{Grouped bar chart of average precision for needs N1 to N13,
+  with one bar for the baseline and one for the boosted setup. The boosted bar
+  is higher in ten needs, with the largest differences in N13, N2, N10 and N5;
+  the baseline bar is higher in N3, N8 and N12, and N2 has no baseline bar
+  because its value is 0.}
+  \label{fig:ap}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
   \includegraphics[width=0.8\linewidth]{imgs/precision_recall.png}
   \caption{Interpolated precision-recall curve of each setup}
   \Description{Line chart of interpolated precision against recall, from 0
@@ -768,8 +781,9 @@ why the curves never rise. We compute these values for each need and plot
 their average, one line per setup.
 
 The boosted curve lies above the baseline at every recall level. At the start
-the two setups are close: the first relevant document appears with an average
-precision of 0.89 in the boosted setup and 0.78 in the baseline. The gap grows
+the two setups are close, with a precision of 0.89 in the boosted setup and
+0.78 in the baseline, since both usually place a relevant document in the
+first positions. The gap grows
 in the middle of the curve: to find half of the relevant documents, 73\% of
 the documents read are relevant in the boosted setup, against 42\% in the
 baseline. At recall 0.8 and above the baseline drops to 0, because in no need
@@ -777,11 +791,15 @@ does its top 10 contain even 80\% of the relevant documents of the pool, while
 the boosted setup retrieves every relevant document in four needs and stays at
 0.2. In other words, whatever share of the relevant documents the user wants
 to find, the boosted setup shows fewer non-relevant documents along the way,
-which agrees with its higher MAP.
+which agrees with its higher MAP. Figure~\ref{fig:prtype} in the appendix shows the
+same curve for each document type. The boosted setup is ahead for races,
+teams and circuits, but not for drivers, where the baseline has the higher
+precision up to recall 0.6, mostly because of N8.
 
 \textbf{Discussion.} The boosted setup raises the MAP from 0.35 to 0.57 and
 the average P@10 from 0.48 to 0.66, and it has the higher AP in ten of the
-thirteen needs (Table~\ref{tab:results}). The largest gains are in N13 (from
+thirteen needs (Table~\ref{tab:results} and Figure~\ref{fig:ap}). The
+largest gains are in N13 (from
 0.03 to 0.72), N2, N10 and N5, and a large part of them comes from the filter
 by document type. Of the 130 documents in the top 10 lists of the baseline,
 31 (24\%) are of the wrong type, and by our criteria these are never
@@ -792,11 +810,11 @@ biographies of drivers killed in accidents, such as François Cevert; and in
 N10, four are biographies, such as that of Jim Hall, whose banned
 ``vacuum cleaner'' car is described in his own article and not in that of a
 team. The field weights help in a different way. In N2 the baseline has no
-relevant document in its top 10, since it also matches the words of the
-query in the qualifying section: the 2023 Canadian Grand Prix is retrieved
-because rain fell during qualifying and a red flag came ``only three
-minutes'' after it began. The boosted setup gives more weight to the summary
-and the race report, where the result of the race is described.
+relevant document in its top 10, because a word counts the same wherever it
+appears: the 2023 Canadian Grand Prix is retrieved because rain fell during
+qualifying and a red flag came ``only three minutes'' after it began. The
+boosted setup gives more weight to the summary, where the result of the race
+is stated, and ranks four relevant races in its top 10.
 
 The baseline is better in N3, N8 and N12, and these, together with N7, are
 also the needs with the lowest AP in the boosted setup. In all of them
@@ -805,27 +823,30 @@ a safety car that \emph{changed} the result, a layout changed \emph{because
 of} an accident, a return \emph{after} an injury, or a \emph{success} at
 Indianapolis rather than a mere participation. The boosted setup ranks first
 documents that contain the words but not the relation. In N3, its first result
-is the 2026 Belgian Grand Prix, where the leader lost and regained the lead
-around a virtual safety car but still won; in N8 it ranks the biographies of
+is the 2026 Belgian Grand Prix, where Kimi Antonelli lost the lead to a rival
+who benefited from a virtual safety car, but still won; in N8 it ranks the biographies of
 drivers who only took part in the Indianapolis 500, such as Carl Scarborough,
 who died during the 1953 race; and in N12 it returns circuits whose chicanes
 were changed to increase overtaking. Words can also match in an unrelated
 sense: the 1967 Monaco Grand Prix is retrieved for N2 because its
-summary calls \emph{unexpected} a victory from four months earlier. Of the
+summary mentions the \emph{unexpected} victory of Pedro Rodríguez in the
+previous race, four months earlier. Of the
 four needs we expected to be hard (Section~\ref{sec:needs}), N7 is among the
-weakest, while N1, N4 and N10 reached an AP between 0.54 and 0.69, thanks to
+weakest, and neither Niki Lauda nor Felipe Massa, the examples given there,
+appears in the top 10 of either setup, while N1, N4 and N10 reached an AP between 0.54 and 0.69, thanks to
 queries with several variants of the same idea and, in N4, to phrases instead
 of single words.
 
 \subsection{Detailed Information Needs}
 \label{sec:detailed}
-The four needs below are described in more detail because they are the
-hardest to satisfy with a search based on words
-(Section~\ref{sec:needs}); the criteria of the other needs are in
-Appendix~\ref{sec:criteria}. For each one we give the full list of
-parameters sent to Solr by the boosted setup. Three of them are the same for
-every need:
+The four needs below, one of each document type, are described in more
+detail; the criteria of the other needs are in Appendix~\ref{sec:criteria}.
+For each one we give the parameters sent to Solr by the boosted setup, apart
+from those used only to highlight the excerpts. These are the same for every
+need:
 \begin{itemize}
+  \item \texttt{defType}: \texttt{edismax}; \texttt{fl}: \texttt{id, title,
+  score}; \texttt{rows}: \texttt{10}
   \item \texttt{qf}: \texttt{title\^{}2 summary\^{}3 background
   qualifying\^{}2 race\^{}2 post\_race\^{}2 other biography\^{}2
   history\^{}2 layout events teams drivers}
@@ -833,10 +854,10 @@ every need:
   post\_race\^{}2 biography\^{}3 history\^{}3}
   \item \texttt{ps2}: \texttt{3}
 \end{itemize}
-The baseline sends the same \texttt{q}, \texttt{q.op}, \texttt{fl},
-\texttt{rows} and \texttt{sort}, but with \texttt{qf=all\_text}, without
-\texttt{pf2} and \texttt{ps2}, and without \texttt{fq}, so it searches the
-whole collection.
+The default operator (\texttt{OR}) and order (by score) of Solr are not
+changed, and each need below adds its own \texttt{q} and \texttt{fq}. The
+baseline sends the same \texttt{q}, \texttt{fl} and \texttt{rows}, but with \texttt{qf=all\_text}, without \texttt{pf2} and
+\texttt{ps2}, and without \texttt{fq}, so it searches the whole collection.
 
 \paragraph{N1: Races decided by a pit-stop or tyre strategy.}
 \textit{Relevance judgement.} The goal is to find Formula One races whose winner was decided by the
@@ -858,14 +879,8 @@ first.
 
 \textit{Query.}
 \begin{itemize}
-  \item \texttt{defType}: \texttt{edismax}
   \item \texttt{q}: \texttt{"pit stop" strategy undercut tyres "two-stop" "one-stop" gamble}
-  \item \texttt{q.op}: \texttt{OR}
-  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
   \item \texttt{fq}: \texttt{type:race}
-  \item \texttt{fl}: \texttt{id, title, score}
-  \item \texttt{rows}: \texttt{10}
-  \item \texttt{sort}: \texttt{score desc}
 \end{itemize}
 
 \paragraph{N7: Drivers who returned after a serious injury.}
@@ -886,14 +901,8 @@ or death, which is why this need is hard.
 
 \textit{Query.}
 \begin{itemize}
-  \item \texttt{defType}: \texttt{edismax}
   \item \texttt{q}: \texttt{serious injury injured recovered returned comeback hospital burns}
-  \item \texttt{q.op}: \texttt{OR}
-  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
   \item \texttt{fq}: \texttt{type:driver}
-  \item \texttt{fl}: \texttt{id, title, score}
-  \item \texttt{rows}: \texttt{10}
-  \item \texttt{sort}: \texttt{score desc}
 \end{itemize}
 
 \paragraph{N10: Technical innovations that were later banned.}
@@ -914,14 +923,8 @@ general ban can still rank high.
 
 \textit{Query.}
 \begin{itemize}
-  \item \texttt{defType}: \texttt{edismax}
   \item \texttt{q}: \texttt{innovation banned outlawed prohibited "fan car" "six-wheeled" "ground effect"}
-  \item \texttt{q.op}: \texttt{OR}
-  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
   \item \texttt{fq}: \texttt{type:team}
-  \item \texttt{fl}: \texttt{id, title, score}
-  \item \texttt{rows}: \texttt{10}
-  \item \texttt{sort}: \texttt{score desc}
 \end{itemize}
 
 \paragraph{N13: Circuits that drivers boycotted or considered too dangerous.}
@@ -941,14 +944,8 @@ without being relevant.
 
 \textit{Query.}
 \begin{itemize}
-  \item \texttt{defType}: \texttt{edismax}
   \item \texttt{q}: \texttt{boycott boycotted refused dangerous unsafe "safety concerns" protest criticized drivers}
-  \item \texttt{q.op}: \texttt{OR}
-  \item \texttt{qf}, \texttt{pf2}, \texttt{ps2}: as above
   \item \texttt{fq}: \texttt{type:circuit}
-  \item \texttt{fl}: \texttt{id, title, score}
-  \item \texttt{rows}: \texttt{10}
-  \item \texttt{sort}: \texttt{score desc}
 \end{itemize}
 
 % =====================================================================
@@ -961,9 +958,9 @@ and categories. On thirteen information needs judged by hand, a setup that
 weights the sections of each document and filters by type raises the MAP from
 0.35 to 0.57 and the average P@10 from 0.48 to 0.66 over a baseline that
 searches all the text as one field. Most of the gain comes from removing
-documents of the wrong type and from favoring the summary, while queries made
-of short phrases improved the needs in which single words appear in almost
-every document. The needs that remain hard are those in which relevance
+documents of the wrong type and from favoring the summary, and needs whose
+words appear in almost every race report required queries made of short
+phrases. The needs that remain hard are those in which relevance
 depends on a relation between two facts, such as an accident and the change
 of layout that followed it, which a search based only on words cannot see.
 
@@ -1178,6 +1175,20 @@ judged.
     \caption{Driver article length versus race entries}
     \Description{Log-log scatter plot of words in each driver article against the number of race entries. Drivers with one to three entries range from 100 to about 2500 words, and length grows with the number of entries up to over 10000 words for drivers with more than 200 entries.}
     \label{fig:driverwords}
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{imgs/precision_recall_by_type.png}
+  \caption{Interpolated precision-recall curve of each setup, by document type}
+  \Description{Four line charts of interpolated precision against recall,
+  one per document type, each with one line for the baseline and one for the
+  boosted setup. The boosted line is above the baseline for races, teams and
+  circuits; for drivers the baseline is above it up to recall 0.6.}
+  \label{fig:prtype}
   \end{minipage}
 \end{figure}
 

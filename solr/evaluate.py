@@ -18,6 +18,10 @@ import matplotlib.pyplot as plt
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOP = 10
 RECALL_LEVELS = [i / 10 for i in range(11)]
+LABELS = {'simple': 'Baseline', 'boosted': 'Boosted'}
+COLORS = {'simple': '#2a78d6', 'boosted': '#eb6834'}
+MARKERS = {'simple': 'o', 'boosted': 's'}
+INK, MUTED, AXIS, GRID = '#0b0b0b', '#52514e', '#8a8984', '#e6e5e0'
 
 
 def read_qrels() -> dict:
@@ -86,14 +90,63 @@ if __name__ == '__main__':
             line += f'{p10:>16}{row["AP"]:>14.3f}'
         print(line)
 
-    plt.figure(figsize=(5, 4))
-    for system, per_need in curves.items():
-        mean = [sum(c[i] for c in per_need) / len(per_need) for i in range(len(RECALL_LEVELS))]
-        plt.plot(RECALL_LEVELS, mean, marker='o', label=system)
-    plt.xlabel('Recall')
-    plt.ylabel('Interpolated precision')
-    plt.ylim(0, 1.05)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(os.path.join(HERE, 'results', 'precision_recall.png'))
-    print('-> results/metrics.csv, results/precision_recall.png')
+    plt.rcParams.update({'font.size': 9, 'axes.edgecolor': AXIS, 'axes.labelcolor': INK,
+                         'xtick.color': MUTED, 'ytick.color': MUTED, 'axes.spines.top': False,
+                         'axes.spines.right': False})
+
+    def mean_curve(per_need):
+        return [sum(c[i] for c in per_need) / len(per_need) for i in range(len(RECALL_LEVELS))]
+
+    def draw_curves(ax, per_system):
+        for system, per_need in per_system.items():
+            ax.plot(RECALL_LEVELS, mean_curve(per_need), color=COLORS[system], linewidth=2,
+                    marker=MARKERS[system], markersize=5, label=LABELS[system])
+        ax.set_ylim(0, 1.05)
+        ax.set_xlim(-0.02, 1.02)
+        ax.grid(axis='y', color=GRID, linewidth=0.6)
+        ax.set_axisbelow(True)
+
+    # Average curve over all needs
+    fig, ax = plt.subplots(figsize=(4.2, 3.2))
+    draw_curves(ax, curves)
+    ax.set_xlabel('Recall')
+    ax.set_ylabel('Interpolated precision')
+    ax.legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, 'results', 'precision_recall.png'), dpi=200)
+    plt.close(fig)
+
+    # Average curve by document type
+    types = {need['id']: need['type'] for need in config['needs']}
+    order = ['race', 'driver', 'team', 'circuit']
+    fig, axes = plt.subplots(1, 4, figsize=(10, 2.6), sharey=True)
+    for ax, doc_type in zip(axes, order):
+        idx = [i for i, n in enumerate(needs) if types[n] == doc_type]
+        draw_curves(ax, {s: [c[i] for i in idx] for s, c in curves.items()})
+        ax.set_title(f'{doc_type.capitalize()}s ({", ".join(needs[i] for i in idx)})'
+                     if len(idx) <= 3 else f'{doc_type.capitalize()}s (N1–N6)', fontsize=9, color=INK)
+        ax.set_xlabel('Recall')
+    axes[0].set_ylabel('Interpolated precision')
+    axes[0].legend(frameon=False, loc='lower left')
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, 'results', 'precision_recall_by_type.png'), dpi=200)
+    plt.close(fig)
+
+    # AP of each need
+    fig, ax = plt.subplots(figsize=(4.2, 2.6))
+    width = 0.38
+    for k, system in enumerate(systems):
+        values = [next(r['AP'] for r in rows if r['system'] == system and r['need'] == n) for n in needs]
+        offset = (k - (len(systems) - 1) / 2) * (width + 0.03)
+        ax.bar([i + offset for i in range(len(needs))], values, width, color=COLORS[system],
+               label=LABELS[system])
+    ax.set_xticks(range(len(needs)), needs, fontsize=8)
+    ax.set_ylabel('Average precision')
+    ax.set_ylim(0, 1)
+    ax.grid(axis='y', color=GRID, linewidth=0.6)
+    ax.set_axisbelow(True)
+    ax.legend(frameon=False, ncol=2, loc='upper left')
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, 'results', 'ap_per_need.png'), dpi=200)
+    plt.close(fig)
+    print('-> results/metrics.csv, precision_recall.png, precision_recall_by_type.png, ap_per_need.png')
