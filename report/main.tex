@@ -553,10 +553,16 @@ each need, and handling them automatically is left for the final system.
 \label{sec:setups}
 We compare two setups. Both use eDisMax, the Solr query parser designed for
 free text, and both run the same query for each information need. A query
-lists the main words of the need and their common variants: for N4 it contains
-\textit{teammates}, \textit{team-mate}, \textit{collided}, \textit{collision},
-\textit{crashed} and \textit{together}. A document does not need to contain all
-of them to be returned, and documents are always ordered by relevance alone.
+usually lists the main words of the need and their common variants: for N1 it
+contains \textit{undercut}, \textit{``two-stop''} and \textit{gamble}, among
+others. In N3 and N4 single words were not enough, since almost every race
+report mentions the safety car, teammates and collisions, so their queries are
+made of short phrases instead, such as \textit{``collided with his
+teammate''}. A number after a phrase (\texttt{\textasciitilde 4}) allows that
+many extra words between its words, so that \textit{``collided with his
+McLaren team-mate''} also matches. A document does not need to contain all
+of the words or phrases to be returned, and documents are always ordered by
+relevance alone.
 Table~\ref{tab:setups} describes the parameters that were used.
 
 \begin{table}[ht]
@@ -589,9 +595,9 @@ documents (Table~\ref{tab:weights}). The summary has the highest weight, since
 it concentrates the main facts of an article, and the sections that narrate
 what happened count more than background information. Documents receive a
 bonus when consecutive words of the query appear close together, such as
-\textit{crashed} and \textit{together} in N4. We apply this bonus to pairs of
-words because our queries are lists of keywords: a bonus that required all of
-them to appear together had no effect on any need. Results are restricted to
+\textit{serious} and \textit{injury} in N7. We apply this bonus to pairs of
+words because most of our queries are lists of keywords: a bonus that required
+all of them to appear together had no effect on any need. Results are restricted to
 the document type requested by each need. The lists of teams and
 drivers are also searched because a race text often names two drivers without
 saying that they are teammates, as in N4. The weights were chosen manually
@@ -638,12 +644,16 @@ with a single click.
 \end{figure}
 
 As an example, for N3 (safety car periods that changed the result) we search
-for \textit{``safety car'' deployed restart lead advantage lost}. The baseline
-finds 1422 documents and the boosted setup finds 984, since it only considers
-races. Their top 10 lists have no document in common, and
-Table~\ref{tab:demo} shows the first three positions. The configuration alone
-therefore changes what the user sees on the first page. Which of the two lists
-is better can only be decided by judging the results.
+for the phrase \textit{``safety car''} together with phrases such as
+\textit{``lost the lead''}, \textit{``wiped out''} and \textit{``pitted
+under''} (Appendix~\ref{sec:criteria}). The baseline finds 1364 documents and
+the boosted setup finds 967, since it only considers races. Their top 10 lists
+have only three documents in common, and Table~\ref{tab:demo} shows the first
+three positions; the third result of the baseline is not even a race, but the
+biography of Nicholas Latifi, whose crash caused the safety car of the 2021
+Abu Dhabi Grand Prix. The configuration alone therefore changes what the user
+sees on the first page. Which of the two lists is better can only be decided
+by judging the results.
 
 \begin{table}[ht]
   \small
@@ -651,9 +661,9 @@ is better can only be decided by judging the results.
     \toprule
     Rank & Baseline & Boosted \\
     \midrule
-    1 & 2017 Azerbaijan GP & 2010 European GP \\
-    2 & 2026 Canadian GP & 1999 Canadian GP \\
-    3 & 2006 Australian GP & 2010 Korean GP \\
+    1 & 2014 Hungarian GP & 2026 Belgian GP \\
+    2 & 1998 British GP & 2000 German GP \\
+    3 & Nicholas Latifi (driver) & 2003 British GP \\
     \bottomrule
   \end{tabular}
   \caption{Top results for N3 in each setup}
@@ -674,7 +684,7 @@ routine pit stops, or where the strategy changed positions outside the fight
 for the victory, is not.
 
 \textbf{Judgements.} Each setup returns its top 10 documents for every need.
-The two lists are merged without duplicates, which gives between 15 and 20
+The two lists are merged without duplicates, which gives between 13 and 20
 documents per need, and each document is judged by hand as relevant (1) or
 not relevant (0). To decide, we read an excerpt of the document in which the
 query words are highlighted and, when that is not enough, the full article.
@@ -688,8 +698,6 @@ top. The mean of the AP values over all needs (MAP) gives a single number per
 setup. We also plot the interpolated precision at eleven recall levels,
 averaged over all needs (Figure~\ref{fig:pr}).
 
-% TODO: run solr/search.py and solr/evaluate.py after judging every
-% solr/qrels/N*.csv file, then replace the "--" values below.
 \begin{table}[ht]
   \small
   \begin{tabular}{lcccc}
@@ -697,21 +705,21 @@ averaged over all needs (Figure~\ref{fig:pr}).
     & \multicolumn{2}{c}{Baseline} & \multicolumn{2}{c}{Boosted} \\
     Need & P@10 & AP & P@10 & AP \\
     \midrule
-    N1 & -- & -- & -- & -- \\
-    N2 & -- & -- & -- & -- \\
-    N3 & -- & -- & -- & -- \\
-    N4 & -- & -- & -- & -- \\
-    N5 & -- & -- & -- & -- \\
-    N6 & -- & -- & -- & -- \\
-    N7 & -- & -- & -- & -- \\
-    N8 & -- & -- & -- & -- \\
-    N9 & -- & -- & -- & -- \\
-    N10 & -- & -- & -- & -- \\
-    N11 & -- & -- & -- & -- \\
-    N12 & -- & -- & -- & -- \\
-    N13 & -- & -- & -- & -- \\
+    N1 & 0.40 & 0.27 & 0.70 & 0.54 \\
+    N2 & 0.00 & 0.00 & 0.40 & 0.60 \\
+    N3 & 0.70 & 0.55 & 0.60 & 0.42 \\
+    N4 & 0.60 & 0.47 & 0.70 & 0.69 \\
+    N5 & 0.40 & 0.38 & 0.90 & 0.84 \\
+    N6 & 0.80 & 0.54 & 0.90 & 0.66 \\
+    N7 & 0.50 & 0.41 & 0.60 & 0.42 \\
+    N8 & 0.70 & 0.57 & 0.60 & 0.33 \\
+    N9 & 0.40 & 0.36 & 0.60 & 0.67 \\
+    N10 & 0.20 & 0.08 & 0.50 & 0.57 \\
+    N11 & 0.80 & 0.51 & 0.90 & 0.61 \\
+    N12 & 0.60 & 0.41 & 0.50 & 0.34 \\
+    N13 & 0.10 & 0.03 & 0.70 & 0.72 \\
     \midrule
-    MAP & & -- & & -- \\
+    MAP & & 0.35 & & 0.57 \\
     \bottomrule
   \end{tabular}
   \caption{Results of each setup}
@@ -726,6 +734,32 @@ averaged over all needs (Figure~\ref{fig:pr}).
   to 1, with one line for the baseline and one for the boosted setup.}
   \label{fig:pr}
 \end{figure}
+
+\textbf{Reading the precision-recall curve.} Figure~\ref{fig:pr} answers the
+question: \emph{to find a given share of the relevant documents, how much of
+what the user reads is useful?} Recall, on the horizontal axis, is the share of
+the relevant documents of a need that have already appeared in the ranking;
+precision, on the vertical axis, is the share of the documents read so far that
+are relevant. Suppose a need has four relevant documents and a setup ranks them
+in positions 1, 3 and 6, missing the fourth. After position 1, recall is 0.25
+and precision is 1.0; after position 3, recall is 0.5 and precision is 0.67;
+after position 6, recall is 0.75 and precision is 0.5; recall 1.0 is never
+reached, so the precision at that level is 0. Interpolation keeps, at each
+recall level, the best precision obtained from that point onwards, which is
+why the curves never rise. We compute these values for each need and plot
+their average, one line per setup.
+
+The boosted curve lies above the baseline at every recall level. At the start
+the two setups are close: the first relevant document appears with an average
+precision of 0.89 in the boosted setup and 0.78 in the baseline. The gap grows
+in the middle of the curve: to find half of the relevant documents, 73\% of
+the documents read are relevant in the boosted setup, against 42\% in the
+baseline. At recall 0.8 and above the baseline drops to 0, because in no need
+does its top 10 contain even 80\% of the relevant documents of the pool, while
+the boosted setup retrieves every relevant document in four needs and stays at
+0.2. In other words, whatever share of the relevant documents the user wants
+to find, the boosted setup shows fewer non-relevant documents along the way,
+which agrees with its higher MAP.
 
 % TODO: write the discussion once the numbers are in. Points to check:
 % - Does boosted beat the baseline in MAP? On which needs is the gap largest?
@@ -972,11 +1006,18 @@ judged.
   N3 & race & The safety car clearly affected the final order or the fight
   for the victory, or its use was controversial. & The safety car is only
   mentioned in passing, with no effect on the result. & \texttt{"safety car"
-  deployed restart lead advantage lost} \\
+  "under the safety car"\textasciitilde 2 controversial "lost the
+  lead"\textasciitilde 3 "wiped out"\textasciitilde 2 "lead
+  was"\textasciitilde 2 advantage benefited "pitted under"\textasciitilde 3
+  "cost him"\textasciitilde 2} \\
   N4 & race & A collision or contact between two drivers of the same team
   during the race. & Collisions between drivers of different teams; near
-  misses. & \texttt{teammates "team-mate" collided collision crashed
-  together} \\
+  misses. & \texttt{"collided with his teammate"\textasciitilde 4 "collided
+  with his team-mate"\textasciitilde 4 "contact with his
+  teammate"\textasciitilde 4 "contact with his team-mate"\textasciitilde 4
+  "teammates collided"\textasciitilde 3 "team-mates collided"\textasciitilde 3
+  "teammate collided"\textasciitilde 3 "team-mate collided"\textasciitilde 3
+  "the two cars collided"\textasciitilde 2} \\
   N5 & race & A death during the Grand Prix weekend (practice, qualifying or
   race). & Deaths at other events mentioned only as context; serious
   accidents without fatalities. & \texttt{fatal accident killed died death}
