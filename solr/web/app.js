@@ -19,7 +19,7 @@ const correction = $("#correction");
 let exact = false;  // true after "search instead for …": the typed words are searched as they are
 
 const TYPE_LABELS = { race: "Races", driver: "Drivers", team: "Teams", circuit: "Circuits" };
-const SYSTEM_LABELS = { simple: "Baseline", boosted: "Boosted" };
+const SYSTEM_LABELS = { schemaless: "Schemaless", simple: "Baseline", boosted: "Boosted" };
 let currentPage = 1;
 
 function addText(parent, tag, text, className) {
@@ -68,7 +68,7 @@ function renderResult(doc, { marks, rank, shared }) {
   top.className = "result-top";
   if (rank) addText(top, "span", String(rank).padStart(2, "0"), "rank");
   addText(top, "span", doc.type, "badge");
-  if (shared) addText(top, "span", "IN BOTH", "badge both");
+  if (shared) addText(top, "span", "IN ALL", "badge both");
   if (doc.score !== undefined) addText(top, "span", `SCORE ${Number(doc.score).toFixed(2)}`, "score");
   card.append(top);
 
@@ -206,11 +206,11 @@ function renderSingle(data, page) {
 
 function renderComparison(runs) {
   const ids = runs.map(({ data }) => new Set(data.results.map(doc => doc.id)));
-  const shared = [...ids[0]].filter(id => ids[1].has(id));
+  const shared = [...ids[0]].filter(id => ids.every(set => set.has(id)));
   heading.replaceChildren();
   heading.append("Top 10 of each setup · ");
   addText(heading, "strong", String(shared.length));
-  heading.append(shared.length === 1 ? " document in both lists" : " documents in both lists");
+  heading.append(shared.length === 1 ? " document in every list" : " documents in every list");
   resultsElement.className = "results compare";
   runs.forEach(({ system, data }) => {
     const column = document.createElement("div");
@@ -243,10 +243,11 @@ async function search(page = 1, { push = true } = {}) {
 
   try {
     if (state.compare) {
-      const runs = await Promise.all(["simple", "boosted"].map(async system =>
+      const runs = await Promise.all(["schemaless", "simple", "boosted"].map(async system =>
         ({ system, data: await fetchResults(state, system, 1) })));
-      renderCorrection(runs[1].data.corrected, state.q);
-      renderTypeCounts(runs[1].data.types, state.type);
+      const main = runs.find(run => run.system === "boosted").data;
+      renderCorrection(main.corrected, state.q);
+      renderTypeCounts(main.types, state.type);
       message.textContent = runs.some(r => r.data.total) ? "" : "No matching documents. Try different keywords.";
       if (runs.some(r => r.data.total)) renderComparison(runs);
     } else {

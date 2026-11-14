@@ -145,7 +145,7 @@ h1 span { color: var(--lime); }
 }
 .quick-searches button:hover { border-color: var(--lime); color: var(--lime); }
 .results-section { max-width: 760px; margin: 64px auto 0; }
-.results-section:has(.compare) { max-width: 1100px; }
+.results-section:has(.compare) { max-width: 1400px; }
 .correction { margin: 0 0 16px; color: #bbc5d3; font-size: 14px; }
 .correction strong { color: var(--lime); }
 .correction .link {
@@ -217,7 +217,7 @@ h1 span { color: var(--lime); }
 .rank { color: #647187; font: 500 11px "DM Mono", monospace; }
 .badge.both { border-color: var(--lime); color: var(--lime); }
 .result-card.shared { border-color: #d3f36b55; }
-.results.compare { grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.results.compare { grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: start; }
 .compare-column { display: grid; gap: 12px; min-width: 0; }
 .compare-column h3 {
   display: flex;
@@ -264,4 +264,9 @@ footer {
   .results-section { margin-top: 62px; }
   .collection-status { font-size: 8px; }
   .topbar { padding: 0 18px; }
+}
+
+/* Three comparison columns need room; stack them on medium screens */
+@media (max-width: 1000px) {
+  .results.compare { grid-template-columns: 1fr; }
 }

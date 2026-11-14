@@ -15,6 +15,10 @@ SOLR_URL = os.environ.get('SOLR_URL', 'http://localhost:8983/solr/f1/select')
 with open(os.path.join(HERE, 'queries.json'), encoding='utf-8') as file:
     CONFIG = json.load(file)
 SYSTEMS = CONFIG['systems']
+# Fields that hold a single value in our schema; the schemaless core guesses every text field as
+# multivalued, so its single values come back as one-element lists and are unwrapped.
+with open(os.path.join(HERE, 'schema.json'), encoding='utf-8') as file:
+    SINGLE_VALUED = {f['name'] for f in json.load(file)['add-field'] if not f.get('multiValued')}
 NEEDS = [{'id': n['id'], 'need': n['need'], 'type': n['type'], 'q': n['q']} for n in CONFIG['needs']]
 
 TYPES = ('race', 'driver', 'team', 'circuit')
@@ -36,8 +40,13 @@ def season_filter(start, end):
     return f'season:{span} OR seasons:{span}'
 
 
-def solr(params):
-    with urlopen(f'{SOLR_URL}?{urlencode(params)}', timeout=10) as response:
+def core_url(core=None):
+    """URL of a core: SOLR_URL points to the main one, other systems may name their own."""
+    return SOLR_URL if not core else SOLR_URL.replace('/f1/select', f'/{core}/select')
+
+
+def solr(params, core=None):
+    with urlopen(f'{core_url(core)}?{urlencode(params)}', timeout=10) as response:
         return json.load(response)
 
 
@@ -135,6 +144,7 @@ class SearchHandler(SimpleHTTPRequestHandler):
             message = str(error) if 'invalid literal' not in str(error) else 'Use numbers for page and seasons.'
             return self.send_json(400, {'error': message})
 
+        core = SYSTEMS[system].get('core')
         settings = {k: v for k, v in SYSTEMS[system].items() if k not in ('filter_type', 'core')}
         filters = []
         if doc_type != 'all':
@@ -157,7 +167,8 @@ class SearchHandler(SimpleHTTPRequestHandler):
             ('sort', 'score desc'),
             ('wt', 'json'),
             ('facet', 'true'),
-            ('facet.field', '{!ex=type}type'),
+            # the schemaless core cannot facet on a text field; Solr adds a string copy, type_str
+            ('facet.field', '{!ex=type}' + ('type_str' if core else 'type')),
             ('hl', 'true'),
             ('hl.method', 'unified'),
             ('hl.fl', TEXT_FIELDS),
@@ -170,19 +181,22 @@ class SearchHandler(SimpleHTTPRequestHandler):
         ]
 
         try:
-            data = solr(query_params)
+            data = solr(query_params, core)
             results = data['response']
-            counts = data['facet_counts']['facet_fields']['type']
+            counts = data['facet_counts']['facet_fields']['type_str' if core else 'type']
         except HTTPError as error:
             message = error.read().decode('utf-8', errors='replace')
             return self.send_json(502, {'error': f'Solr rejected the search: {message[:500]}'})
         except (URLError, TimeoutError) as error:
-            return self.send_json(503, {'error': f'Cannot reach Solr at {SOLR_URL}: {error}'})
+            return self.send_json(503, {'error': f'Cannot reach Solr at {core_url(core)}: {error}'})
         except (json.JSONDecodeError, KeyError, TypeError) as error:
             return self.send_json(502, {'error': f'Unexpected response from Solr: {error}'})
 
         highlighting = data.get('highlighting', {})
         for doc in results['docs']:
+            for field, value in doc.items():
+                if field in SINGLE_VALUED and isinstance(value, list):
+                    doc[field] = value[0] if value else None
             fragments = [f for field in highlighting.get(doc['id'], {}).values() for f in field]
             doc['snippet'] = ' … '.join(' '.join(f.split()) for f in fragments[:2])
 

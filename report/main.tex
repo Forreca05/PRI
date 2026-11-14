@@ -489,7 +489,8 @@ in the collection and compensates for document length, which matters here
 because the length of our documents is very uneven
 (Section~\ref{sec:characterization}). Solr runs in a Docker container, and a
 single script creates the container, defines the fields and loads the
-documents, so the whole index can be rebuilt at any time.
+documents, together with a copy without our schema used for comparison
+(Section~\ref{sec:setups}), so the whole index can be rebuilt at any time.
 
 \subsection{What Is Indexed}
 \label{sec:indexing}
@@ -652,8 +653,8 @@ Once the script mentioned above has run, all 2058 documents can be
 searched. Queries can be tested in the Solr interface,
 which shows every parameter and how each score was computed, or in a small web
 application that we built (Figure~\ref{fig:webapp}). There, a user types a
-query, restricts it by document type and range of seasons, and chooses the
-baseline or the boosted setup or shows both side by side. Each result shows its main
+query, restricts it by document type and range of seasons, and chooses one
+of the three setups or shows them side by side. Each result shows its main
 structured fields and an excerpt of the text with the query words
 highlighted, and the information needs of Table~\ref{tab:needs} can be run
 with a single click.
@@ -664,7 +665,7 @@ with a single click.
   \caption{Search page of the web application}
   \Description{Dark search page titled ``Searching the history of Formula 1''
   with a search box, filters for document type, seasons and ranking setup, an
-  option to compare both setups, and buttons with the information needs N1 to
+  option to compare all setups, and buttons with the information needs N1 to
   N13.}
   \label{fig:webapp}
 \end{figure}
@@ -672,24 +673,26 @@ with a single click.
 As an example, for N3 (safety car periods that changed the result) we search
 for the phrase \textit{``safety car''} together with phrases such as
 \textit{``lost the lead''}, \textit{``wiped out''} and \textit{``pitted
-under''} (Appendix~\ref{sec:criteria}). The baseline finds 1364 documents and
-the boosted setup finds 967, since it only considers races. Their top 10 lists
-have only three documents in common, and Table~\ref{tab:demo} shows the first
-three positions; the third result of the baseline is not even a race, but the
-biography of Nicholas Latifi, whose crash caused the safety car of the 2021
-Abu Dhabi Grand Prix. The configuration alone therefore changes what the user
-sees on the first page. Which of the two lists is better can only be decided
-by judging the results.
+under''} (Appendix~\ref{sec:criteria}). The baseline finds 1364 documents,
+the boosted setup 967, since it only considers races, and the schemaless
+setup 759, since without stemming fewer forms of each word match. Only three
+documents appear in all three top 10 lists, and Table~\ref{tab:demo} shows
+the first three positions; the third result of the baseline is not even a
+race, but the biography of Nicholas Latifi, whose crash caused the safety car
+of the 2021 Abu Dhabi Grand Prix. The configuration alone therefore changes
+what the user sees on the first page. Which list is better can only be
+decided by judging the results.
 
 \begin{table}[ht]
   \small
-  \begin{tabular}{lll}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llll}
     \toprule
-    Rank & Baseline & Boosted \\
+    Rank & Schemaless & Baseline & Boosted \\
     \midrule
-    1 & 2014 Hungarian GP & 2026 Belgian GP \\
-    2 & 1998 British GP & 2000 German GP \\
-    3 & Nicholas Latifi (driver) & 2003 British GP \\
+    1 & 2026 Belgian GP & 2014 Hungarian GP & 2026 Belgian GP \\
+    2 & 2003 British GP & 1998 British GP & 2000 German GP \\
+    3 & 2021 Abu Dhabi GP & Latifi (driver) & 2003 British GP \\
     \bottomrule
   \end{tabular}
   \caption{Top results for N3 in each setup}
@@ -763,7 +766,7 @@ averaged over all needs (Figure~\ref{fig:pr}).
   \includegraphics[width=\linewidth]{imgs/ap_per_need.png}
   \caption{Average precision of each need in each setup}
   \Description{Grouped bar chart of average precision for needs N1 to N13,
-  with one bar for each setup. The boosted bar is the highest in ten needs;
+  with one bar for each setup. The boosted bar is the highest in nine needs;
   the baseline bar is higher than the boosted one in N3, N8 and N12, and the
   schemaless bar is the highest in N3 and N5 but is 0 in N7, N8 and N10.}
   \label{fig:ap}
@@ -838,7 +841,7 @@ who died during the 1953 race; and in N12 it returns circuits whose chicanes
 were changed to increase overtaking. Of the
 four needs we expected to be hard (Section~\ref{sec:needs}), N7 is among the
 weakest, and neither Niki Lauda nor Felipe Massa, the examples given there,
-appears in the top 10 of either setup, while N1, N4 and N10 reached an AP between 0.54 and 0.69, thanks to
+appears in the top 10 of any setup, while N1, N4 and N10 reached an AP between 0.54 and 0.69, thanks to
 queries with several variants of the same idea and, in N4, to phrases instead
 of single words.
 
@@ -1206,9 +1209,9 @@ judged.
   \includegraphics[width=\textwidth]{imgs/precision_recall_by_type.png}
   \caption{Interpolated precision-recall curve of each setup, by document type}
   \Description{Four line charts of interpolated precision against recall,
-  one per document type, each with one line for the baseline and one for the
-  boosted setup. The boosted line is above the baseline for races, teams and
-  circuits; for drivers the baseline is above it up to recall 0.6.}
+  one per document type, each with one line for each setup. The boosted line
+  is above the baseline for races, teams and circuits; for drivers the
+  baseline is above it up to recall 0.6, and the schemaless line is at 0.}
   \label{fig:prtype}
   \end{minipage}
 \end{figure}
