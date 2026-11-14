@@ -135,7 +135,7 @@ class SearchHandler(SimpleHTTPRequestHandler):
             message = str(error) if 'invalid literal' not in str(error) else 'Use numbers for page and seasons.'
             return self.send_json(400, {'error': message})
 
-        settings = {k: v for k, v in SYSTEMS[system].items() if k != 'filter_type'}
+        settings = {k: v for k, v in SYSTEMS[system].items() if k not in ('filter_type', 'core')}
         filters = []
         if doc_type != 'all':
             filters.append(f'{{!tag=type}}type:{doc_type}')

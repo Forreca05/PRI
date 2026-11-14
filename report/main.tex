@@ -2,6 +2,7 @@
 \usepackage{float}
 \usepackage{multicol}
 \usepackage{longtable}
+\usepackage{array}
 \captionsetup[table]{position=bottom}
 
 \setcopyright{none}
@@ -56,10 +57,11 @@
   linked through the article URLs stored by Jolpica. A reproducible pipeline
   collects, cleans and links the sources into 2058 documents about races,
   drivers, teams and circuits from 1950 to 2026, which are indexed in Apache
-  Solr with a separate analysis for free text and for names. We evaluate two
-  ranking setups on thirteen information needs. Weighting the sections of
-  each document and filtering by document type raises the mean average
-  precision from 0.35 to 0.57 over a single-field baseline, but needs that
+  Solr with a separate analysis for free text and for names. We evaluate three
+  ranking setups on thirteen information needs. Our schema alone raises the
+  mean average precision from 0.25, with Solr's default field types, to 0.34,
+  and weighting the sections of each document and filtering by document type
+  raises it to 0.54, but needs that
   depend on a cause and its effect, such as a circuit redesigned after an
   accident, remain hard for a search based only on words.
 \end{abstract}
@@ -113,7 +115,7 @@ In this project, we present Gridly, a search system that integrates both
 types of information. We build a collection in which each race, driver,
 team and circuit is one document that joins its structured fields from
 Jolpica F1 with its text from Wikipedia, index it in Apache
-Solr~\cite{solr}, and evaluate two retrieval setups on questions that need
+Solr~\cite{solr}, and evaluate three retrieval setups on questions that need
 the text, such as finding the races decided by a late mechanical failure.
 
 The remainder of this paper is organized as follows.
@@ -121,7 +123,7 @@ Section~\ref{sec:dataset} describes the dataset, including its sources,
 preparation, quality, structure and characterization.
 Section~\ref{sec:needs} presents the search scenarios used to evaluate the
 system. Section~\ref{sec:ir} explains how the documents are indexed and
-searched and the two setups we compare, and Section~\ref{sec:evaluation}
+searched and the three setups we compare, and Section~\ref{sec:evaluation}
 evaluates them. Finally, Section~\ref{sec:conclusions} concludes and
 outlines future work.
 
@@ -566,8 +568,8 @@ of each need, and handling them automatically is left as future work.
 
 \subsection{Retrieval Setups}
 \label{sec:setups}
-We compare two setups. Both use eDisMax~\cite{edismax}, the Solr query
-parser designed for free text, and both run the same query for each information need. A query
+We compare three setups. All use eDisMax~\cite{edismax}, the Solr query
+parser designed for free text, and all run the same query for each information need. A query
 usually lists the main words of the need and their common variants: for N1 it
 contains \textit{undercut}, \textit{``two-stop''} and \textit{gamble}, among
 others. In N3 and N4 single words were not enough, since almost every race
@@ -582,26 +584,34 @@ Table~\ref{tab:setups} describes the parameters that were used.
 
 \begin{table}[ht]
   \small
-  \begin{tabular}{p{0.6cm}p{3cm}p{1.3cm}p{1.85cm}}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{p{0.65cm}>{\raggedright\arraybackslash}p{2.35cm}>{\raggedright\arraybackslash}p{1.35cm}>{\raggedright\arraybackslash}p{1.05cm}>{\raggedright\arraybackslash}p{1.5cm}}
     \toprule
-    Name & Meaning & Baseline & Boosted \\
+    Name & Meaning & Schemaless & Baseline & Boosted \\
     \midrule
-    \texttt{q} & Words to search for & same & same \\
-    \texttt{qf} & Fields to search and their weights & one field & several
-    (Table~\ref{tab:weights}) \\
-    \texttt{pf2} & Bonus when pairs of query words appear close together & not
-    used & several (Table~\ref{tab:weights}) \\
-    \texttt{ps2} & Maximum distance between words for that bonus & not used & 3
-    positions \\
-    \texttt{fq} & Restricts the results without changing their score & not
-    used & type of the need \\
+    \texttt{q} & Words to search for & same & same & same \\
+    \texttt{qf} & Fields to search and their weights & 11 fields, equal & one
+    field & several (Table~\ref{tab:weights}) \\
+    \texttt{pf2} & Bonus when pairs of query words appear close together & -- &
+    -- & several (Table~\ref{tab:weights}) \\
+    \texttt{ps2} & Maximum distance between words for that bonus & -- & -- &
+    3 positions \\
+    \texttt{fq} & Restricts the results without changing their score & -- & --
+    & type of the need \\
     \bottomrule
   \end{tabular}
   \caption{Query parameters of each setup}
   \label{tab:setups}
 \end{table}
 
-The \textbf{baseline} represents a minimal configuration. The title and all
+The \textbf{schemaless} setup shows what Solr does without our schema: the
+same documents are loaded into a second index with Solr's default
+configuration, which guesses each field type from its first value. Text fields
+are only split and lowercased, without stop words, stemming or accent folding,
+and as there is no \texttt{all\_text}, the query searches the title and the
+ten text sections with equal weight, over the whole collection.
+
+The \textbf{baseline} uses our schema with a minimal query. The title and all
 Wikipedia sections are copied into a single field, so a word counts the same
 wherever it appears, and the search covers the whole collection.
 
@@ -642,8 +652,8 @@ Once the script mentioned above has run, all 2058 documents can be
 searched. Queries can be tested in the Solr interface,
 which shows every parameter and how each score was computed, or in a small web
 application that we built (Figure~\ref{fig:webapp}). There, a user types a
-query, restricts it by document type and range of seasons, and chooses one of
-the two setups or shows both side by side. Each result shows its main
+query, restricts it by document type and range of seasons, and chooses the
+baseline or the boosted setup or shows both side by side. Each result shows its main
 structured fields and an excerpt of the text with the query words
 highlighted, and the information needs of Table~\ref{tab:needs} can be run
 with a single click.
@@ -689,7 +699,7 @@ by judging the results.
 % =====================================================================
 \section{EVALUATION}
 \label{sec:evaluation}
-We evaluate both setups on the thirteen information needs of
+We evaluate the three setups on the thirteen information needs of
 Table~\ref{tab:needs}. For each need, we wrote down beforehand what makes a
 document relevant and what does not, so that every judgement follows the
 same rule. Appendix~\ref{sec:criteria} lists these criteria together with
@@ -700,17 +710,16 @@ routine pit stops, or where the strategy changed positions outside the fight
 for the victory, is not.
 
 \textbf{Judgements.} Each setup returns its top 10 documents for every need.
-The two lists are merged without duplicates, which gives between 13 and 18
+The three lists are merged without duplicates, which gives between 16 and 28
 documents per need, and each document is judged by hand as relevant (1) or
 not relevant (0). To decide, we read an excerpt of the document in which the
 query words are highlighted and, when that is not enough, the full article.
-The relevant documents of a need are those judged relevant in this merged
-list, so recall is measured relative to it and not to the whole collection.
-This is a limitation: a relevant document that neither setup placed in its
-top 10 is never judged, so recall is overestimated for both setups, and
-a document found by only one setup counts as missed by the other. Judging
-the whole collection was not feasible, and since both setups are compared on
-the same pool, the comparison between them remains fair.
+Recall is measured relative to this merged list, not to the whole collection.
+This is a limitation: a relevant document that no setup placed in its top 10
+is never judged, so recall is overestimated, and a document found by only one
+setup counts as missed by the others. Judging the whole collection was not
+feasible, and since all setups share the same pool, the comparison remains
+fair.
 
 \textbf{Metrics.} For each need and setup we compute precision at 10 (P@10),
 the share of relevant documents in the first page of results, and average
@@ -721,26 +730,28 @@ averaged over all needs (Figure~\ref{fig:pr}).
 
 \begin{table}[ht]
   \small
-  \begin{tabular}{lcccc}
+  \setlength{\tabcolsep}{4.5pt}
+  \begin{tabular}{lcccccc}
     \toprule
-    & \multicolumn{2}{c}{Baseline} & \multicolumn{2}{c}{Boosted} \\
-    Need & P@10 & AP & P@10 & AP \\
+    & \multicolumn{2}{c}{Schemaless} & \multicolumn{2}{c}{Baseline} & \multicolumn{2}{c}{Boosted} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+    Need & P@10 & AP & P@10 & AP & P@10 & AP \\
     \midrule
-    N1 & 0.40 & 0.27 & 0.70 & 0.54 \\
-    N2 & 0.00 & 0.00 & 0.40 & 0.60 \\
-    N3 & 0.70 & 0.55 & 0.60 & 0.42 \\
-    N4 & 0.60 & 0.47 & 0.70 & 0.69 \\
-    N5 & 0.40 & 0.38 & 0.90 & 0.84 \\
-    N6 & 0.80 & 0.54 & 0.90 & 0.66 \\
-    N7 & 0.50 & 0.41 & 0.60 & 0.42 \\
-    N8 & 0.70 & 0.57 & 0.60 & 0.33 \\
-    N9 & 0.40 & 0.36 & 0.60 & 0.67 \\
-    N10 & 0.20 & 0.08 & 0.50 & 0.57 \\
-    N11 & 0.80 & 0.51 & 0.90 & 0.61 \\
-    N12 & 0.60 & 0.41 & 0.50 & 0.34 \\
-    N13 & 0.10 & 0.03 & 0.70 & 0.72 \\
+    N1 & 0.40 & 0.22 & 0.40 & 0.27 & 0.70 & 0.54 \\
+    N2 & 0.10 & 0.05 & 0.00 & 0.00 & 0.40 & 0.60 \\
+    N3 & 0.80 & 0.51 & 0.70 & 0.46 & 0.60 & 0.35 \\
+    N4 & 0.50 & 0.41 & 0.60 & 0.47 & 0.70 & 0.69 \\
+    N5 & 0.90 & 0.69 & 0.40 & 0.26 & 0.90 & 0.58 \\
+    N6 & 0.80 & 0.56 & 0.80 & 0.54 & 0.90 & 0.66 \\
+    N7 & 0.00 & 0.00 & 0.50 & 0.41 & 0.60 & 0.42 \\
+    N8 & 0.00 & 0.00 & 0.70 & 0.57 & 0.60 & 0.33 \\
+    N9 & 0.30 & 0.25 & 0.40 & 0.36 & 0.60 & 0.66 \\
+    N10 & 0.00 & 0.00 & 0.20 & 0.08 & 0.50 & 0.57 \\
+    N11 & 0.60 & 0.30 & 0.80 & 0.51 & 0.90 & 0.61 \\
+    N12 & 0.30 & 0.18 & 0.60 & 0.41 & 0.50 & 0.34 \\
+    N13 & 0.20 & 0.07 & 0.10 & 0.03 & 0.70 & 0.72 \\
     \midrule
-    MAP & & 0.35 & & 0.57 \\
+    Mean & 0.38 & 0.25 & 0.48 & 0.34 & 0.66 & 0.54 \\
     \bottomrule
   \end{tabular}
   \caption{Results of each setup}
@@ -752,19 +763,19 @@ averaged over all needs (Figure~\ref{fig:pr}).
   \includegraphics[width=\linewidth]{imgs/ap_per_need.png}
   \caption{Average precision of each need in each setup}
   \Description{Grouped bar chart of average precision for needs N1 to N13,
-  with one bar for the baseline and one for the boosted setup. The boosted bar
-  is higher in ten needs, with the largest differences in N13, N2, N10 and N5;
-  the baseline bar is higher in N3, N8 and N12, and N2 has no baseline bar
-  because its value is 0.}
+  with one bar for each setup. The boosted bar is the highest in ten needs;
+  the baseline bar is higher than the boosted one in N3, N8 and N12, and the
+  schemaless bar is the highest in N3 and N5 but is 0 in N7, N8 and N10.}
   \label{fig:ap}
 \end{figure}
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.8\linewidth]{imgs/precision_recall.png}
+  \includegraphics[width=0.66\linewidth]{imgs/precision_recall.png}
   \caption{Interpolated precision-recall curve of each setup}
   \Description{Line chart of interpolated precision against recall, from 0
-  to 1, with one line for the baseline and one for the boosted setup.}
+  to 1, with one line for each setup. The boosted line is the highest and the
+  schemaless line the lowest at every recall level.}
   \label{fig:pr}
 \end{figure}
 
@@ -773,32 +784,27 @@ question: \emph{to find a given share of the relevant documents, how much of
 what the user reads is useful?} Recall, on the horizontal axis, is the share of
 the relevant documents of a need that have already appeared in the ranking;
 precision, on the vertical axis, is the share of the documents read so far that
-are relevant. Suppose a need has four relevant documents and a setup ranks them
-in positions 1, 3 and 6, missing the fourth. After position 1, recall is 0.25
-and precision is 1.0; after position 3, recall is 0.5 and precision is 0.67;
-after position 6, recall is 0.75 and precision is 0.5; recall 1.0 is never
-reached, so the precision at that level is 0. Interpolation keeps, at each
-recall level, the best precision obtained from that point onwards, which is
-why the curves never rise. We compute these values for each need and plot
+are relevant. If a need has four relevant documents ranked 1, 3 and 6, recall
+0.5 is reached at position 3 with precision 0.67, and recall 1.0 is never
+reached, so its precision is 0. Interpolation keeps, at each recall level,
+the best precision from that point onwards, so the curves never rise. We compute these values for each need and plot
 their average, one line per setup.
 
-The boosted curve lies above the baseline at every recall level. At the start
-the two setups are close, with a precision of 0.89 in the boosted setup and
-0.78 in the baseline, since both usually place a relevant document in the
-first positions. The gap grows
-in the middle of the curve: to find half of the relevant documents, 73\% of
+The boosted curve lies above the baseline at every recall level. The two
+start close (0.89 and 0.78), since both usually rank a relevant document
+first, and the gap grows
+in the middle of the curve: to find half of the relevant documents, 71\% of
 the documents read are relevant in the boosted setup, against 42\% in the
 baseline. At recall 0.8 and above the baseline drops to 0, because in no need
 does its top 10 contain even 80\% of the relevant documents of the pool, while
-the boosted setup retrieves every relevant document in four needs and stays at
-0.2. In other words, whatever share of the relevant documents the user wants
-to find, the boosted setup shows fewer non-relevant documents along the way,
-which agrees with its higher MAP. Figure~\ref{fig:prtype} in the appendix shows the
+the boosted setup retrieves every relevant document in three needs and stays at
+0.13. The schemaless curve is the lowest, starting at 0.58 and reaching 0
+already at recall 0.7. Figure~\ref{fig:prtype} in the appendix shows the
 same curve for each document type. The boosted setup is ahead for races,
 teams and circuits, but not for drivers, where the baseline has the higher
 precision up to recall 0.6, mostly because of N8.
 
-\textbf{Discussion.} The boosted setup raises the MAP from 0.35 to 0.57 and
+\textbf{Discussion.} The boosted setup raises the MAP from 0.34 to 0.54 and
 the average P@10 from 0.48 to 0.66, and it has the higher AP in ten of the
 thirteen needs (Table~\ref{tab:results} and Figure~\ref{fig:ap}). The
 largest gains are in N13 (from
@@ -829,15 +835,23 @@ is the 2026 Belgian Grand Prix, where Kimi Antonelli lost the lead to a rival
 who benefited from a virtual safety car, but still won; in N8 it ranks the biographies of
 drivers who only took part in the Indianapolis 500, such as Carl Scarborough,
 who died during the 1953 race; and in N12 it returns circuits whose chicanes
-were changed to increase overtaking. Words can also match in an unrelated
-sense: the 1967 Monaco Grand Prix is retrieved for N2 because its
-summary mentions the \emph{unexpected} victory of Pedro Rodríguez in the
-previous race, four months earlier. Of the
+were changed to increase overtaking. Of the
 four needs we expected to be hard (Section~\ref{sec:needs}), N7 is among the
 weakest, and neither Niki Lauda nor Felipe Massa, the examples given there,
 appears in the top 10 of either setup, while N1, N4 and N10 reached an AP between 0.54 and 0.69, thanks to
 queries with several variants of the same idea and, in N4, to phrases instead
 of single words.
+
+\textbf{Effect of the schema.} Without our schema, the MAP falls to 0.25 and
+the average P@10 to 0.38. Part of the loss comes from the missing analysis
+(without stemming, \textit{returned} no longer finds \textit{return}), but
+most comes from the missing \texttt{all\_text} field: with each section
+searched separately, BM25 measures how rare a word is in each field, and
+\textit{injury} appears in 12\% of the biographies but only 3\% of the race
+sections, so a match in a race report counts more. Race reports fill the
+rankings, with 60 of the 130 results of the wrong type (31 in the baseline),
+and N7, N8 and N10 get no relevant document; for the same reason the
+schemaless setup beats the baseline in the race needs N2, N3, N5 and N6.
 
 \subsection{Detailed Information Needs}
 \label{sec:detailed}
@@ -861,7 +875,9 @@ need:
 The default operator (\texttt{OR}) and order (by score) of Solr are not
 changed, and each need below adds its own \texttt{q} and \texttt{fq}. The
 baseline sends the same \texttt{q}, \texttt{fl} and \texttt{rows}, but with \texttt{qf=all\_text}, without \texttt{pf2} and
-\texttt{ps2}, and without \texttt{fq}, so it searches the whole collection.
+\texttt{ps2}, and without \texttt{fq}, so it searches the whole collection;
+the schemaless setup does the same on its index, with \texttt{qf} listing the
+title and text sections.
 
 \needheading{N1: Races decided by a pit-stop or tyre strategy}
 \textit{Relevance judgement:} The goal is to find Formula One races whose winner was decided by the
@@ -958,10 +974,11 @@ without being relevant.
 We built a reproducible collection of 2058 Formula One documents that joins
 the results of Jolpica F1 with the text of Wikipedia, characterized it, and
 indexed it in Apache Solr with a different analysis for narrative text, names
-and categories. On thirteen information needs judged by hand, a setup that
-weights the sections of each document and filters by type raises the MAP from
-0.35 to 0.57 and the average P@10 from 0.48 to 0.66 over a baseline that
-searches all the text as one field. Most of the gain comes from removing
+and categories. On thirteen information needs judged by hand, our schema
+raises the MAP from 0.25 to 0.34 over Solr's default field types, and a setup
+that weights the sections of each document and filters by type raises it to
+0.54, and the average P@10 from 0.48 to 0.66, over a baseline that searches
+all the text as one field. Most of the gain comes from removing
 documents of the wrong type and from favoring the summary, and needs whose
 words appear in almost every race report required queries made of short
 phrases. The needs that remain hard are those in which relevance
@@ -970,18 +987,17 @@ of layout that followed it, which a search based only on words cannot see.
 
 The most challenging part was turning Wikipedia into usable text: the API
 blocks one-request-per-page clients, the wikitext mixes prose with tables
-and templates, and some links led to disambiguation pages. These were
-solved with batched and cached requests, a parser that keeps only the
-prose, and automatic link resolution.
+and templates, and some links led to disambiguation pages, which we solved
+with batched and cached requests, a prose-only parser and automatic link
+resolution.
 
 As future work, we plan to add semantic search with text embeddings,
 combined with BM25 in a hybrid ranking, and compare it with the current
 setups on the harder information needs, where the same idea is written in
 different ways. We will also explore synonyms and query expansion for racing
-vocabulary, and extend the web application with more filters over the
-structured fields, such as nationality or team, and with links between
-related documents. Finally, we will judge longer result lists, so that recall
-is estimated over a larger pool of documents.
+vocabulary, add filters such as nationality or team to the web application,
+and judge longer result lists, so that recall is estimated over a larger
+pool.
 
 % =====================================================================
 \onecolumn
@@ -1038,11 +1054,12 @@ cut with ``\ldots''.
 \section{Relevance Criteria and Queries}
 \label{sec:criteria}
 Relevance criteria and query of each information need. The query \texttt{q}
-is the same in both setups and is parsed by eDisMax with the default
+is the same in all three setups and is parsed by eDisMax with the default
 operator \texttt{OR}, so a document does not need to contain every word. The
 boosted setup also applies the filter \texttt{fq=type:<type>} and the field
 weights of Table~\ref{tab:weights}; the baseline searches every document in
-the \texttt{all\_text} field. Results are sorted by score, and the top 10 are
+the \texttt{all\_text} field, and the schemaless setup searches the title and
+the ten text sections of an index without our schema. Results are sorted by score, and the top 10 are
 judged.
 
 {\small

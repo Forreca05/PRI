@@ -25,7 +25,7 @@ Baseado no tutorial *05-solr* da cadeira, adaptado ao nosso projeto.
 Requisitos: Docker e a coleção já gerada (`cd pipeline && make` cria `data/processed/documents.json`).
 
 ```bash
-./solr/startup.sh                    # Solr + schema + 2058 documentos (~10 s)
+./solr/startup.sh                    # Solr + schema + 2058 documentos (+ core sem schema)
 .venv/bin/python solr/search.py      # corre as queries N1–N13 nos sistemas
 # preencher a coluna 'relevant' em solr/qrels/*.csv com 1 ou 0
 .venv/bin/python solr/evaluate.py    # P@10, AP, MAP e curva precision-recall
@@ -179,6 +179,11 @@ dos dados (o tipo de data normal exige `1950-05-13T00:00:00Z`).
 O schema tem de ser enviado **antes** dos documentos, porque não se aplica a documentos já
 indexados. Por isso o `startup.sh` faz sempre: container novo → schema → documentos.
 **Sempre que se muda o `schema.json`, corre-se o `startup.sh` outra vez.**
+
+O `startup.sh` cria também um segundo core, `f1_schemaless`, com o configset por omissão do
+Solr e **sem** o nosso `schema.json`: o Solr adivinha o tipo de cada campo pelo primeiro valor
+(texto → `text_general`, sem stemming nem stopwords, e sem `all_text`). Serve de baseline
+"sem schema" na avaliação (sistema `schemaless` do `queries.json`, campo `"core"`).
 
 Ver a definição atual de um campo ou tipo:
 

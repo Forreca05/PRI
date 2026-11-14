@@ -1,5 +1,11 @@
 {
     "systems": {
+        "schemaless": {
+            "core": "f1_schemaless",
+            "defType": "edismax",
+            "qf": "title summary background qualifying race post_race other biography history layout events",
+            "filter_type": false
+        },
         "simple": {
             "defType": "edismax",
             "qf": "all_text",

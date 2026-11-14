@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOP = 10
 RECALL_LEVELS = [i / 10 for i in range(11)]
-LABELS = {'simple': 'Baseline', 'boosted': 'Boosted'}
-COLORS = {'simple': '#2a78d6', 'boosted': '#eb6834'}
-MARKERS = {'simple': 'o', 'boosted': 's'}
+LABELS = {'schemaless': 'Schemaless', 'simple': 'Baseline', 'boosted': 'Boosted'}
+COLORS = {'schemaless': '#8a8984', 'simple': '#2a78d6', 'boosted': '#eb6834'}
+MARKERS = {'schemaless': '^', 'simple': 'o', 'boosted': 's'}
 INK, MUTED, AXIS, GRID = '#0b0b0b', '#52514e', '#8a8984', '#e6e5e0'
 
 
@@ -133,11 +133,11 @@ if __name__ == '__main__':
     plt.close(fig)
 
     # AP of each need
-    fig, ax = plt.subplots(figsize=(4.2, 2.6))
-    width = 0.38
+    fig, ax = plt.subplots(figsize=(4.2, 2.3))
+    width = 0.8 / len(systems)
     for k, system in enumerate(systems):
         values = [next(r['AP'] for r in rows if r['system'] == system and r['need'] == n) for n in needs]
-        offset = (k - (len(systems) - 1) / 2) * (width + 0.03)
+        offset = (k - (len(systems) - 1) / 2) * width
         ax.bar([i + offset for i in range(len(needs))], values, width, color=COLORS[system],
                label=LABELS[system])
     ax.set_xticks(range(len(needs)), needs, fontsize=8)
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     ax.set_ylim(0, 1)
     ax.grid(axis='y', color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, ncol=2, loc='upper left')
+    ax.legend(frameon=False, ncol=len(systems), loc='upper left', fontsize=8)
     fig.tight_layout()
     fig.savefig(os.path.join(HERE, 'results', 'ap_per_need.png'), dpi=200)
     plt.close(fig)
